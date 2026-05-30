@@ -332,7 +332,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           <button class="ctab active" onclick="selCulto(this,'domingo-matutino')">📖 Escuela Dominical</button>
           <button class="ctab" onclick="selCulto(this,'domingo-vespertino')">🔥 Evangelístico</button>
           <button class="ctab" onclick="selCulto(this,'miercoles')">🕊️ Miércoles</button>
+          <button class="ctab" onclick="selCulto(this,'jueves')">🙏 Jueves - Oración</button>
           <button class="ctab" onclick="selCulto(this,'viernes')">✝️ Viernes</button>
+          <button class="ctab" onclick="selCulto(this,'sabado')">🔥 Sábado - Juventud</button>
           <button class="ctab" onclick="selCulto(this,'matutino')">🌅 Matutino (Lun/Mié/Vie)</button>
         </div>
       </div>
@@ -434,7 +436,9 @@ const ZONAS = {
   'domingo-matutino':  ZONAS_BASE,
   'domingo-vespertino':ZONAS_BASE,
   'miercoles':         ZONAS_BASE,
+  'jueves':            ZONAS_BASE,
   'viernes':           ZONAS_BASE,
+  'sabado':            ZONAS_BASE,
   'matutino':          ZONAS_BASE,
 };
 
@@ -442,7 +446,9 @@ const CULTO_LABELS = {
   'domingo-matutino':  '📖 Escuela Dominical',
   'domingo-vespertino':'🔥 Evangelístico',
   'miercoles':         '🕊️ Miércoles',
+  'jueves':            '🙏 Oración y Adoración',
   'viernes':           '✝️ Viernes',
+  'sabado':            '🔥 Juventud',
   'matutino':          '🌅 Matutino (Lun/Mié/Vie)',
 };
 
