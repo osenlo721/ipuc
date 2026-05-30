@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "ipuc-algarrobo",
     "public": ".",
     "ignore": [
       "firebase.json",

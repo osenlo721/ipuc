@@ -132,11 +132,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-send{background:var(--azul);color:white;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 
 /* CULTOS */
-.culto-selector{background:white;border-radius:var(--radio);padding:14px;margin-bottom:10px;box-shadow:var(--sombra)}
-.culto-selector-title{font-size:12px;font-weight:700;color:var(--oscuro);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
-.culto-tabs{display:flex;gap:6px;flex-wrap:wrap}
-.ctab{font-size:12px;padding:7px 14px;border-radius:20px;border:1.5px solid var(--gris-b);cursor:pointer;background:var(--gris);color:var(--gris-t);font-weight:600;transition:all .15s}
-.ctab.active{background:var(--azul);color:white;border-color:var(--azul)}
+.culto-header-card{background:linear-gradient(135deg,var(--oscuro),var(--azul));border-radius:var(--radio);padding:16px 18px;margin-bottom:6px;color:white;display:flex;align-items:center;justify-content:space-between;cursor:pointer;box-shadow:var(--sombra);user-select:none}
+.culto-header-label{font-size:10px;opacity:.75;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.culto-header-name{font-size:18px;font-weight:700}
+.culto-header-arrow{font-size:22px;opacity:.85;transition:transform .2s}
+.culto-menu-dropdown{background:white;border-radius:var(--radio);box-shadow:var(--sombra);margin-bottom:8px;overflow:hidden;display:none}
+.culto-menu-dropdown.open{display:block}
+.culto-menu-item{padding:14px 18px;font-size:14px;font-weight:600;color:var(--oscuro);cursor:pointer;border-bottom:1px solid var(--gris-b)}
+.culto-menu-item:last-child{border-bottom:none}
+.culto-menu-item:active{background:var(--gris)}
+.culto-fecha-card{background:white;border-radius:var(--radio);padding:12px 16px;margin-bottom:8px;box-shadow:var(--sombra);font-size:13px;color:var(--oscuro);font-weight:600;display:flex;align-items:center;gap:8px}
+.culto-zona-card{background:white;border-radius:var(--radio);padding:14px;margin-bottom:8px;box-shadow:var(--sombra)}
 .zone-block{background:white;border-radius:var(--radio);padding:14px;margin-bottom:10px;box-shadow:var(--sombra)}
 .zone-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .zone-name{font-size:14px;font-weight:700;color:var(--oscuro)}
@@ -323,23 +329,46 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
     <!-- CULTOS / ASISTENCIA -->
     <div id="view-cultos" class="view">
-      <div class="sec-header"><h3>✝️ Registro de Cultos</h3><p>Asistencia por culto y zona</p></div>
 
-      <!-- Selector de culto -->
-      <div class="culto-selector">
-        <div class="culto-selector-title">📅 Selecciona el culto</div>
-        <div class="culto-tabs">
-          <button class="ctab active" onclick="selCulto(this,'domingo-matutino')">📖 Escuela Dominical</button>
-          <button class="ctab" onclick="selCulto(this,'domingo-vespertino')">🔥 Evangelístico</button>
-          <button class="ctab" onclick="selCulto(this,'miercoles')">🕊️ Miércoles</button>
-          <button class="ctab" onclick="selCulto(this,'jueves')">🙏 Jueves - Oración</button>
-          <button class="ctab" onclick="selCulto(this,'viernes')">✝️ Viernes</button>
-          <button class="ctab" onclick="selCulto(this,'sabado')">🔥 Sábado - Juventud</button>
-          <button class="ctab" onclick="selCulto(this,'matutino')">🌅 Matutino (Lun/Mié/Vie)</button>
+      <!-- Título clickeable -->
+      <div class="culto-header-card" onclick="toggleCultoMenu()">
+        <div>
+          <div class="culto-header-label">Culto activo — toca para cambiar</div>
+          <div class="culto-header-name" id="culto-header-name">📖 Escuela Dominical</div>
         </div>
+        <span class="culto-header-arrow" id="culto-arrow">▾</span>
       </div>
 
-      <!-- Consolidado del día -->
+      <!-- Menú desplegable de cultos -->
+      <div class="culto-menu-dropdown" id="culto-menu-dropdown">
+        <div class="culto-menu-item" onclick="selCulto('domingo-matutino','📖 Escuela Dominical')">📖 Escuela Dominical</div>
+        <div class="culto-menu-item" onclick="selCulto('domingo-vespertino','🔥 Culto Evangelístico')">🔥 Culto Evangelístico</div>
+        <div class="culto-menu-item" onclick="selCulto('matutino','🌅 Matutino (Lun/Mié/Vie)')">🌅 Matutino (Lun/Mié/Vie)</div>
+        <div class="culto-menu-item" onclick="selCulto('miercoles','🕊️ Miércoles')">🕊️ Miércoles</div>
+        <div class="culto-menu-item" onclick="selCulto('viernes','✝️ Viernes')">✝️ Viernes</div>
+        <div class="culto-menu-item" onclick="selCulto('campana','📣 Campaña')">📣 Campaña</div>
+      </div>
+
+      <!-- Fecha actual -->
+      <div class="culto-fecha-card">📅 <span id="culto-fecha-txt"></span></div>
+
+      <!-- Select de zonas (solo para cultos que lo requieren) -->
+      <div class="culto-zona-card" id="zona-select-wrap" style="display:none">
+        <label class="form-label">🗺️ Zona</label>
+        <select class="form-input" id="zona-select">
+          <option value="">— Todas las zonas —</option>
+          <option>Zona 1</option>
+          <option>Zona 2</option>
+          <option>Zona 3</option>
+          <option>Zona 4</option>
+          <option>Zona 5</option>
+          <option>Zona 6</option>
+          <option>Zona 7</option>
+          <option>Zona 8 - Estación Villa</option>
+        </select>
+      </div>
+
+      <!-- Consolidado del culto -->
       <div class="consolidado">
         <h3>📊 Consolidado del culto</h3>
         <div class="conso-grid">
@@ -350,7 +379,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         </div>
       </div>
 
-      <!-- Zonas -->
+      <!-- Bloques por zona -->
       <div id="zonas-container"></div>
 
       <div style="height:8px"></div>
@@ -431,26 +460,27 @@ let roomActivo = null;
 let chatUnsub = null;
 
 // ─── Zonas y cultos ────────────────────────────────────────────────
-const ZONAS_BASE = ['Zona 1','Zona 2','Zona 3','Zona 4','Zona 5','Zona 6','Zona 7','Zona 8','Estación Villa'];
+const ZONAS_BASE = ['Zona 1','Zona 2','Zona 3','Zona 4','Zona 5','Zona 6','Zona 7','Zona 8 - Estación Villa'];
+
+// Cultos sin selección de zona
+const CULTOS_SIN_ZONA = ['domingo-matutino','domingo-vespertino'];
 
 const ZONAS = {
   'domingo-matutino':  ZONAS_BASE,
   'domingo-vespertino':ZONAS_BASE,
-  'miercoles':         ZONAS_BASE,
-  'jueves':            ZONAS_BASE,
-  'viernes':           ZONAS_BASE,
-  'sabado':            ZONAS_BASE,
   'matutino':          ZONAS_BASE,
+  'miercoles':         ZONAS_BASE,
+  'viernes':           ZONAS_BASE,
+  'campana':           ZONAS_BASE,
 };
 
 const CULTO_LABELS = {
   'domingo-matutino':  '📖 Escuela Dominical',
-  'domingo-vespertino':'🔥 Evangelístico',
-  'miercoles':         '🕊️ Miércoles',
-  'jueves':            '🙏 Oración y Adoración',
-  'viernes':           '✝️ Viernes',
-  'sabado':            '🔥 Juventud',
+  'domingo-vespertino':'🔥 Culto Evangelístico',
   'matutino':          '🌅 Matutino (Lun/Mié/Vie)',
+  'miercoles':         '🕊️ Miércoles',
+  'viernes':           '✝️ Viernes',
+  'campana':           '📣 Campaña',
 };
 
 const AV_COLORS = ['av-azul','av-dorado','av-verde','av-morado','av-azul','av-verde'];
@@ -471,6 +501,7 @@ onAuthStateChanged(auth, async user => {
     }
     await crearPerfilSiNoExiste(user);
     cargarPosts();
+    initCultosUI();
     renderZonas();
     cargarStats('sem');
   } else {
@@ -520,7 +551,7 @@ window.nav = function(v, el) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   if (v === 'inicio')  cargarPosts();
-  if (v === 'cultos')  renderZonas();
+  if (v === 'cultos')  { initCultosUI(); renderZonas(); }
   if (v === 'stats')   cargarStats(periodoActivo);
 }
 
@@ -653,10 +684,30 @@ window.sendMsg = async function() {
 }
 
 // ─── CULTOS / ASISTENCIA ───────────────────────────────────────────
-window.selCulto = function(btn, culto) {
+function initCultosUI() {
+  const hoy = new Date();
+  const opts = {weekday:'long',year:'numeric',month:'long',day:'numeric'};
+  const fechaEl = document.getElementById('culto-fecha-txt');
+  if (fechaEl) fechaEl.textContent = hoy.toLocaleDateString('es-CO', opts);
+  // Mostrar/ocultar zona select según culto activo
+  const wrap = document.getElementById('zona-select-wrap');
+  if (wrap) wrap.style.display = CULTOS_SIN_ZONA.includes(cultoActivo) ? 'none' : 'block';
+}
+
+window.toggleCultoMenu = function() {
+  const menu = document.getElementById('culto-menu-dropdown');
+  const arrow = document.getElementById('culto-arrow');
+  menu.classList.toggle('open');
+  arrow.textContent = menu.classList.contains('open') ? '▴' : '▾';
+}
+
+window.selCulto = function(culto, label) {
   cultoActivo = culto;
-  document.querySelectorAll('.ctab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  document.getElementById('culto-header-name').textContent = label;
+  document.getElementById('culto-menu-dropdown').classList.remove('open');
+  document.getElementById('culto-arrow').textContent = '▾';
+  const wrap = document.getElementById('zona-select-wrap');
+  if (wrap) wrap.style.display = CULTOS_SIN_ZONA.includes(culto) ? 'none' : 'block';
   renderZonas();
 }
 
