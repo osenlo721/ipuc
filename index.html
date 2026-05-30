@@ -469,7 +469,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
 import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, query, orderBy, limit, onSnapshot, serverTimestamp, where } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyD-kUzxG5qIPMSXfQkDOGZTqRekkWl1ICc",
@@ -561,9 +561,23 @@ async function crearPerfilSiNoExiste(user) {
   }
 }
 
+const esMóvil = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
+
+// Capturar resultado del redirect al volver de Google en móvil
+getRedirectResult(auth).catch(() => {});
+
 window.loginGoogle = async function() {
-  try { await signInWithPopup(auth, provider); }
-  catch(e) { if (e.code !== 'auth/popup-closed-by-user') toast('❌ Error al iniciar sesión'); }
+  try {
+    if (esMóvil) {
+      await signInWithRedirect(auth, provider);
+    } else {
+      await signInWithPopup(auth, provider);
+    }
+  } catch(e) {
+    if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
+      toast('❌ Error al iniciar sesión. Intenta de nuevo.');
+    }
+  }
 }
 
 window.cerrarSesion = async function() {
