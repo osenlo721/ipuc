@@ -1,0 +1,17 @@
+{
+  "name": "IPUC Algarrobo",
+  "short_name": "IPUC",
+  "description": "Red comunitaria IPUC Algarrobo — muro, oraciones, chat, asistencia y campañas",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#003B6F",
+  "theme_color": "#009FDA",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "categories": ["lifestyle", "social"],
+  "lang": "es",
+  "dir": "ltr"
+}

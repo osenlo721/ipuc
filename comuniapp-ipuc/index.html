@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#009FDA">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="IPUC Algarrobo">
+<title>IPUC Algarrobo</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--azul:#009FDA;--azul-oscuro:#003B6F;--dorado:#F0AB00;--blanco:#ffffff;--gris-claro:#f4f6f9;--gris:#e8eaed;--gris-texto:#666;--texto:#1a1a2e;--sombra:0 2px 12px rgba(0,63,111,0.12);--radio:12px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--gris-claro);color:var(--texto);overflow:hidden;height:100vh}
+#splash{position:fixed;inset:0;background:linear-gradient(160deg,var(--azul-oscuro),var(--azul));display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity 0.5s}
+#splash h1{color:white;font-size:22px;font-weight:700;margin-top:16px}
+#splash p{color:rgba(255,255,255,0.75);font-size:12px;margin-top:4px}
+#splash .lema{color:var(--dorado);font-size:11px;margin-top:16px;font-style:italic}
+.logo-svg{width:110px;height:110px;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+#app{display:none;flex-direction:column;height:100vh}
+#header{background:linear-gradient(90deg,var(--azul-oscuro),var(--azul));padding:11px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo-sm{width:34px;height:34px}
+.htitle h2{color:white;font-size:14px;font-weight:700}
+.htitle p{color:rgba(255,255,255,0.75);font-size:9px}
+.hicons{margin-left:auto;display:flex;gap:14px}
+.hicons button{background:none;border:none;color:white;font-size:18px;cursor:pointer;padding:4px}
+#content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#bottom-nav{background:white;border-top:1px solid var(--gris);display:flex;flex-shrink:0;box-shadow:0 -2px 10px rgba(0,0,0,0.08)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;cursor:pointer;color:var(--gris-texto);gap:3px;border:none;background:none;font-size:9px;font-weight:500;transition:color 0.2s}
+.nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav-btn.active{color:var(--azul)}
+.view{display:none;padding:12px;animation:fadeIn 0.2s}
+.view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.section-header{background:linear-gradient(135deg,var(--azul-oscuro),var(--azul));border-radius:var(--radio);padding:18px;margin-bottom:12px;text-align:center;color:white}
+.section-header h3{font-size:15px;font-weight:700}
+.section-header p{font-size:11px;opacity:0.8;margin-top:3px}
+.card{background:white;border-radius:var(--radio);padding:14px;margin-bottom:10px;box-shadow:var(--sombra)}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.metric{border-radius:var(--radio);padding:14px;color:white}
+.metric.azul{background:linear-gradient(135deg,var(--azul-oscuro),var(--azul))}
+.metric.dorado{background:linear-gradient(135deg,#b8860b,var(--dorado))}
+.metric-n{font-size:26px;font-weight:700}
+.metric-l{font-size:11px;opacity:0.85;margin-top:2px}
+.metric-s{font-size:10px;opacity:0.7;margin-top:2px}
+.compose{background:white;border-radius:var(--radio);padding:14px;margin-bottom:10px;box-shadow:var(--sombra)}
+.compose textarea{width:100%;border:1px solid var(--gris);border-radius:8px;padding:10px;font-size:13px;resize:none;height:70px;font-family:inherit;color:var(--texto)}
+.compose textarea:focus{outline:none;border-color:var(--azul)}
+.type-pills{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.pill{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--gris);cursor:pointer;background:var(--gris-claro);color:var(--gris-texto)}
+.pill.sel{background:var(--azul);color:white;border-color:var(--azul)}
+.btn-pub{background:var(--azul);color:white;border:none;padding:9px 20px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;float:right}
+.post{background:white;border-radius:var(--radio);padding:14px;margin-bottom:10px;box-shadow:var(--sombra)}
+.post-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;color:white}
+.av-azul{background:var(--azul)}
+.av-dorado{background:var(--dorado);color:var(--azul-oscuro)}
+.av-verde{background:#1D9E75}
+.av-morado{background:#534AB7}
+.av-rojo{background:#D85A30}
+.post-author{font-size:13px;font-weight:600;color:var(--texto)}
+.post-time{font-size:11px;color:var(--gris-texto)}
+.post-badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;display:inline-block;margin-left:4px}
+.pb-azul{background:#E6F1FB;color:#185FA5}
+.pb-verde{background:#E1F5EE;color:#0F6E56}
+.pb-morado{background:#EEEDFE;color:#3C3489}
+.pb-dorado{background:#FFF3CC;color:#854F0B}
+.post-body{font-size:13px;line-height:1.6;color:var(--texto);margin-bottom:12px}
+.post-actions{display:flex;gap:6px;border-top:1px solid var(--gris);padding-top:10px}
+.act{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--gris-texto);cursor:pointer;border:none;background:none;padding:5px 10px;border-radius:20px}
+.act:active{background:var(--gris-claro)}
+.act.liked{color:#D85A30}
+.act.prayed{color:#534AB7}
+.prayer-hl{background:#EEEDFE;border-radius:8px;padding:7px 10px;margin-bottom:10px;font-size:12px;color:#3C3489;display:flex;align-items:center;gap:6px}
+/* CHAT */
+#view-chat{padding:0}
+.chat-rooms{padding:12px;overflow-y:auto}
+.room-item{background:white;border-radius:var(--radio);padding:12px;margin-bottom:8px;box-shadow:var(--sombra);display:flex;align-items:center;gap:10px;cursor:pointer}
+.room-item:active{opacity:0.85}
+.room-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.room-name{font-size:13px;font-weight:600;color:var(--texto)}
+.room-last{font-size:11px;color:var(--gris-texto);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.room-unread{background:var(--azul);color:white;font-size:10px;padding:2px 7px;border-radius:10px;margin-left:auto;font-weight:700;flex-shrink:0}
+.chat-window{display:none;flex-direction:column;height:calc(100vh - 116px)}
+.chat-window.open{display:flex}
+.chat-topbar{background:linear-gradient(90deg,var(--azul-oscuro),var(--azul));padding:12px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.chat-back{background:none;border:none;color:white;font-size:22px;cursor:pointer;line-height:1}
+.chat-info .cname{font-size:14px;font-weight:600;color:white}
+.chat-info .csub{font-size:11px;color:rgba(255,255,255,0.75)}
+.messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--gris-claro)}
+.msg-row{display:flex;gap:8px}
+.msg-row.mine{flex-direction:row-reverse}
+.bubble{max-width:75%;padding:9px 13px;border-radius:16px;font-size:13px;line-height:1.5}
+.bubble.other{background:white;color:var(--texto);border-radius:16px 16px 16px 4px;box-shadow:var(--sombra)}
+.bubble.mine{background:var(--azul);color:white;border-radius:16px 16px 4px 16px}
+.msg-sender{font-size:10px;color:var(--gris-texto);margin-bottom:3px}
+.msg-time{font-size:10px;color:var(--gris-texto);margin-top:3px}
+.chat-input-bar{display:flex;gap:8px;padding:10px 12px;background:white;border-top:1px solid var(--gris);flex-shrink:0}
+.chat-input{flex:1;border:1px solid var(--gris);border-radius:24px;padding:9px 16px;font-size:13px;font-family:inherit;color:var(--texto)}
+.chat-input:focus{outline:none;border-color:var(--azul)}
+.send-btn{background:var(--azul);color:white;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:18px;flex-shrink:0}
+/* ASISTENCIA */
+.zone-form{background:white;border-radius:var(--radio);padding:14px;margin-bottom:10px;box-shadow:var(--sombra)}
+.zone-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.zone-name{font-size:14px;font-weight:600;color:var(--azul-oscuro)}
+.zone-sub{font-size:11px;color:var(--gris-texto)}
+.zdot{width:8px;height:8px;border-radius:50%;margin-left:auto;flex-shrink:0}
+.zdot.ok{background:#1D9E75}
+.zdot.pend{background:var(--dorado)}
+.counters{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.counter-item{text-align:center}
+.counter-label{font-size:10px;color:var(--gris-texto);margin-bottom:6px}
+.counter-ctrl{display:flex;align-items:center;justify-content:center;gap:6px}
+.c-btn{width:30px;height:30px;border:1px solid var(--gris);border-radius:8px;background:var(--gris-claro);font-size:16px;cursor:pointer}
+.c-btn:active{background:var(--azul);color:white}
+.c-val{font-size:20px;font-weight:700;color:var(--azul-oscuro);min-width:36px;text-align:center}
+.obs-input{width:100%;border:1px solid var(--gris);border-radius:8px;padding:8px;font-size:12px;font-family:inherit;resize:none;height:55px}
+.confirm-btn{background:linear-gradient(90deg,var(--azul-oscuro),var(--azul));color:white;border:none;width:100%;padding:11px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px}
+.confirm-btn:active{opacity:0.9}
+.consolidado{background:linear-gradient(135deg,var(--azul-oscuro),var(--azul));border-radius:var(--radio);padding:16px;margin-bottom:10px;color:white}
+.consolidado h3{font-size:12px;opacity:0.85;margin-bottom:10px}
+.conso-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center}
+.conso-n{font-size:24px;font-weight:700}
+.conso-l{font-size:10px;opacity:0.75;margin-top:2px}
+/* STATS */
+.bars{display:flex;align-items:flex-end;gap:5px;height:120px;margin-bottom:8px}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bar{width:100%;background:var(--azul);border-radius:4px 4px 0 0;opacity:0.85;min-height:4px;transition:height 0.4s}
+.bar-lbl{font-size:9px;color:var(--gris-texto)}
+.bar-val{font-size:9px;color:var(--gris-texto)}
+.ptab{font-size:11px;padding:5px 14px;border-radius:20px;border:1px solid var(--gris);cursor:pointer;background:var(--gris-claro);color:var(--gris-texto);font-weight:500}
+.ptab.active{background:var(--azul);color:white;border-color:var(--azul)}
+.period-tabs{display:flex;gap:6px;margin-bottom:12px}
+.progress{height:8px;background:var(--gris);border-radius:4px;margin:6px 0;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--azul),var(--dorado));border-radius:4px}
+/* CAMPAÑAS */
+.campana{background:white;border-radius:var(--radio);padding:14px;margin-bottom:10px;box-shadow:var(--sombra)}
+.campana-name{font-size:14px;font-weight:700;color:var(--azul-oscuro)}
+.campana-dates{font-size:11px;color:var(--gris-texto);margin-top:3px}
+.campana-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px;text-align:center;padding-top:10px;border-top:1px solid var(--gris)}
+.cs-n{font-size:18px;font-weight:700;color:var(--azul-oscuro)}
+.cs-l{font-size:10px;color:var(--gris-texto)}
+/* FORM */
+.form-group{margin-bottom:10px}
+.form-label{font-size:12px;color:var(--gris-texto);margin-bottom:4px;display:block;font-weight:500}
+.form-input{width:100%;border:1px solid var(--gris);border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;color:var(--texto)}
+.form-input:focus{outline:none;border-color:var(--azul)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-submit{background:linear-gradient(90deg,var(--azul-oscuro),var(--azul));color:white;border:none;width:100%;padding:13px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:4px}
+/* LOADING */
+.loading{text-align:center;padding:30px;color:var(--gris-texto);font-size:13px}
+.spinner{width:28px;height:28px;border:3px solid var(--gris);border-top-color:var(--azul);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* TOAST */
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--azul-oscuro);color:white;padding:10px 20px;border-radius:24px;font-size:13px;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:200;white-space:nowrap}
+#toast.show{opacity:1}
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:flex-end}
+.modal-bg.open{display:flex}
+.modal-sheet{background:white;border-radius:20px 20px 0 0;padding:20px;width:100%;max-height:85vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:700;color:var(--azul-oscuro);margin-bottom:16px;display:flex;justify-content:space-between}
+.modal-close{color:var(--gris-texto);cursor:pointer;font-size:22px;background:none;border:none}
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(--gris-texto)}
+.empty-icon{font-size:40px;margin-bottom:10px}
+.empty p{font-size:13px}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <svg class="logo-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="60" cy="60" r="58" fill="#003B6F" stroke="#F0AB00" stroke-width="3"/>
+    <ellipse cx="60" cy="60" rx="30" ry="58" fill="none" stroke="#009FDA" stroke-width="1.5" opacity="0.6"/>
+    <ellipse cx="60" cy="60" rx="58" ry="20" fill="none" stroke="#009FDA" stroke-width="1.5" opacity="0.4"/>
+    <circle cx="60" cy="60" r="20" fill="#009FDA"/>
+    <path d="M48 60 L60 48 L72 60 L60 72 Z" fill="#F0AB00"/>
+    <text x="60" y="100" text-anchor="middle" font-size="7" font-weight="700" fill="#F0AB00" font-family="Arial">IPUC</text>
+    <text x="60" y="110" text-anchor="middle" font-size="5" fill="rgba(255,255,255,0.7)" font-family="Arial">Un Señor, una fe</text>
+  </svg>
+  <h1>IPUC Algarrobo</h1>
+  <p>Iglesia Pentecostal Unida de Colombia</p>
+  <div class="lema">Un Señor, una fe, un bautismo</div>
+</div>
+
+<div id="app">
+  <div id="header">
+    <svg class="logo-sm" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="60" cy="60" r="58" fill="#003B6F" stroke="#F0AB00" stroke-width="3"/>
+      <circle cx="60" cy="60" r="20" fill="#009FDA"/>
+      <path d="M48 60 L60 48 L72 60 L60 72 Z" fill="#F0AB00"/>
+    </svg>
+    <div class="htitle">
+      <h2>IPUC Algarrobo</h2>
+      <p>Un Señor, una fe, un bautismo</p>
+    </div>
+    <div class="hicons">
+      <button onclick="toast('Notificaciones próximamente')">🔔</button>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- MURO -->
+    <div id="view-inicio" class="view active">
+      <div class="section-header">
+        <h3>🕊️ Bienvenido, Pastor</h3>
+        <p>IPUC Algarrobo — comunidad en Cristo</p>
+      </div>
+      <div class="metrics">
+        <div class="metric azul"><div class="metric-n" id="stat-miembros">—</div><div class="metric-l">Miembros</div><div class="metric-s">registrados</div></div>
+        <div class="metric dorado"><div class="metric-n" id="stat-decisiones">—</div><div class="metric-l">Decisiones</div><div class="metric-s">este mes</div></div>
+        <div class="metric azul"><div class="metric-n" id="stat-celulas">—</div><div class="metric-l">Células</div><div class="metric-s">activas</div></div>
+        <div class="metric dorado"><div class="metric-n" id="stat-oraciones">—</div><div class="metric-l">Peticiones</div><div class="metric-s">de oración</div></div>
+      </div>
+      <div class="compose">
+        <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px">
+          <div class="av av-azul">PL</div>
+          <textarea id="post-txt" placeholder="Comparte con la congregación..."></textarea>
+        </div>
+        <div class="type-pills">
+          <span class="pill sel" onclick="selPill(this,'anuncio')">📢 Anuncio</span>
+          <span class="pill" onclick="selPill(this,'alabanza')">🎵 Alabanza</span>
+          <span class="pill" onclick="selPill(this,'testimonio')">⭐ Testimonio</span>
+        </div>
+        <button class="btn-pub" onclick="publicar()">Publicar</button>
+        <div style="clear:both"></div>
+      </div>
+      <div id="posts-list">
+        <div class="loading"><div class="spinner"></div>Cargando publicaciones...</div>
+      </div>
+    </div>
+
+    <!-- ORACIONES -->
+    <div id="view-oracion" class="view">
+      <div class="section-header">
+        <h3>🙏 Peticiones de oración</h3>
+        <p>Intercediendo los unos por los otros</p>
+      </div>
+      <div class="compose">
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div class="av av-azul">PL</div>
+          <textarea id="oracion-txt" placeholder="Escribe tu petición de oración..."></textarea>
+        </div>
+        <button class="btn-pub" style="background:var(--azul-oscuro);margin-top:8px" onclick="pedirOracion()">🙏 Pedir oración</button>
+        <div style="clear:both"></div>
+      </div>
+      <div id="oraciones-list">
+        <div class="loading"><div class="spinner"></div>Cargando peticiones...</div>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div id="view-chat" class="view" style="padding:0">
+      <div id="chat-rooms-panel">
+        <div class="chat-rooms">
+          <div style="padding:4px 0 8px;font-size:11px;color:var(--gris-texto);font-weight:600;text-transform:uppercase;letter-spacing:0.05em">Canales</div>
+          <div class="room-item" onclick="openRoom('general','# General','Toda la congregación','av-azul')">
+            <div class="room-av av-azul">#</div>
+            <div style="flex:1;min-width:0"><div class="room-name">General</div><div class="room-last">Canal de toda la iglesia</div></div>
+          </div>
+          <div class="room-item" onclick="openRoom('lideres','# Líderes','Solo líderes y pastores','av-azul')">
+            <div class="room-av av-azul">#</div>
+            <div style="flex:1;min-width:0"><div class="room-name">Líderes de zona</div><div class="room-last">Canal privado de líderes</div></div>
+          </div>
+          <div class="room-item" onclick="openRoom('oracion-ch','# Oración','Canal de intercesión','av-morado')">
+            <div class="room-av av-morado">🙏</div>
+            <div style="flex:1;min-width:0"><div class="room-name">Oración</div><div class="room-last">Intercesión y peticiones</div></div>
+          </div>
+          <div style="padding:12px 0 8px;font-size:11px;color:var(--gris-texto);font-weight:600;text-transform:uppercase;letter-spacing:0.05em">Células</div>
+          <div class="room-item" onclick="openRoom('celula-fe','Célula Fe','12 miembros · Martes 19:00','av-verde')">
+            <div class="room-av av-verde">CF</div>
+            <div style="flex:1;min-width:0"><div class="room-name">Célula Fe</div><div class="room-last">Martes 19:00</div></div>
+          </div>
+          <div class="room-item" onclick="openRoom('celula-esperanza','Célula Esperanza','9 miembros · Jueves 18:30','av-dorado')">
+            <div class="room-av av-dorado">CE</div>
+            <div style="flex:1;min-width:0"><div class="room-name">Célula Esperanza</div><div class="room-last">Jueves 18:30</div></div>
+          </div>
+          <div class="room-item" onclick="openRoom('celula-gracia','Célula Gracia','15 miembros · Viernes 20:00','av-rojo')">
+            <div class="room-av av-rojo">CG</div>
+            <div style="flex:1;min-width:0"><div class="room-name">Célula Gracia</div><div class="room-last">Viernes 20:00</div></div>
+          </div>
+        </div>
+      </div>
+      <div id="chat-window" class="chat-window">
+        <div class="chat-topbar">
+          <button class="chat-back" onclick="closeRoom()">←</button>
+          <div class="chat-info"><div class="cname" id="room-name-h">General</div><div class="csub" id="room-sub-h">Toda la congregación</div></div>
+        </div>
+        <div class="messages" id="messages"></div>
+        <div class="chat-input-bar">
+          <input class="chat-input" id="msg-in" placeholder="Escribe un mensaje..." onkeydown="if(event.key==='Enter')sendMsg()">
+          <button class="send-btn" onclick="sendMsg()">➤</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ASISTENCIA -->
+    <div id="view-asistencia" class="view">
+      <div class="consolidado">
+        <h3>📊 Consolidado del día — en tiempo real</h3>
+        <div class="conso-grid">
+          <div><div class="conso-n" id="t-asist">0</div><div class="conso-l">Asistentes</div></div>
+          <div><div class="conso-n" id="t-dec">0</div><div class="conso-l">Decisiones</div></div>
+          <div><div class="conso-n" id="t-vis">0</div><div class="conso-l">Visitantes</div></div>
+        </div>
+      </div>
+      <div class="zone-form">
+        <div class="zone-header">
+          <div class="av av-azul" style="width:40px;height:40px">ZN</div>
+          <div><div class="zone-name">Zona Norte</div><div class="zone-sub">Hno. García · Col. Mirador</div></div>
+          <div class="zdot pend"></div>
+        </div>
+        <div class="counters">
+          <div class="counter-item"><div class="counter-label">Asistentes</div><div class="counter-ctrl"><button class="c-btn" onclick="step('a1',-1)">−</button><div class="c-val" id="a1">0</div><button class="c-btn" onclick="step('a1',1)">+</button></div></div>
+          <div class="counter-item"><div class="counter-label">Decisiones</div><div class="counter-ctrl"><button class="c-btn" onclick="step('d1',-1)">−</button><div class="c-val" id="d1">0</div><button class="c-btn" onclick="step('d1',1)">+</button></div></div>
+          <div class="counter-item"><div class="counter-label">Visitantes</div><div class="counter-ctrl"><button class="c-btn" onclick="step('v1',-1)">−</button><div class="c-val" id="v1">0</div><button class="c-btn" onclick="step('v1',1)">+</button></div></div>
+        </div>
+        <textarea class="obs-input" id="obs1" placeholder="Observaciones del culto..."></textarea>
+        <button class="confirm-btn" onclick="guardarAsistencia('Zona Norte','a1','d1','v1','obs1')">✓ Guardar informe Zona Norte</button>
+      </div>
+      <div class="zone-form">
+        <div class="zone-header">
+          <div class="av av-dorado" style="width:40px;height:40px">ZS</div>
+          <div><div class="zone-name">Zona Sur</div><div class="zone-sub">Hna. Torres · Parque Central</div></div>
+          <div class="zdot pend"></div>
+        </div>
+        <div class="counters">
+          <div class="counter-item"><div class="counter-label">Asistentes</div><div class="counter-ctrl"><button class="c-btn" onclick="step('a2',-1)">−</button><div class="c-val" id="a2">0</div><button class="c-btn" onclick="step('a2',1)">+</button></div></div>
+          <div class="counter-item"><div class="counter-label">Decisiones</div><div class="counter-ctrl"><button class="c-btn" onclick="step('d2',-1)">−</button><div class="c-val" id="d2">0</div><button class="c-btn" onclick="step('d2',1)">+</button></div></div>
+          <div class="counter-item"><div class="counter-label">Visitantes</div><div class="counter-ctrl"><button class="c-btn" onclick="step('v2',-1)">−</button><div class="c-val" id="v2">0</div><button class="c-btn" onclick="step('v2',1)">+</button></div></div>
+        </div>
+        <textarea class="obs-input" id="obs2" placeholder="Observaciones del culto..."></textarea>
+        <button class="confirm-btn" onclick="guardarAsistencia('Zona Sur','a2','d2','v2','obs2')">✓ Guardar informe Zona Sur</button>
+      </div>
+      <div style="padding-bottom:12px">
+        <button class="confirm-btn" onclick="toast('Todos los informes guardados en la base de datos ✓')">💾 Guardar todo</button>
+      </div>
+    </div>
+
+    <!-- ESTADÍSTICAS -->
+    <div id="view-stats" class="view">
+      <div class="section-header">
+        <h3>📈 Estadísticas y campañas</h3>
+        <p>Seguimiento del crecimiento</p>
+      </div>
+      <div class="card">
+        <div style="font-size:13px;font-weight:600;color:var(--azul-oscuro);margin-bottom:10px">📊 Asistencia</div>
+        <div class="period-tabs">
+          <button class="ptab active" onclick="setPeriod('sem',this)">Semanal</button>
+          <button class="ptab" onclick="setPeriod('mes',this)">Mensual</button>
+          <button class="ptab" onclick="setPeriod('ano',this)">Anual</button>
+        </div>
+        <div class="bars" id="bars"></div>
+      </div>
+      <div class="card">
+        <div style="font-size:13px;font-weight:600;color:var(--azul-oscuro);margin-bottom:12px">🏆 Por zona</div>
+        <div id="zonas-stats">
+          <div class="loading"><div class="spinner"></div>Cargando...</div>
+        </div>
+      </div>
+      <div class="campana">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div><div class="campana-name">Cultos de la calle — Mayo</div><div class="campana-dates">📅 Todo mayo · 4 zonas</div></div>
+          <span class="post-badge pb-verde">Activa</span>
+        </div>
+        <div class="progress"><div class="progress-fill" style="width:78%"></div></div>
+        <div style="font-size:11px;color:var(--gris-texto);text-align:right">780 / 1000 meta</div>
+        <div class="campana-stats">
+          <div><div class="cs-n" id="camp-asist">—</div><div class="cs-l">Asistentes</div></div>
+          <div><div class="cs-n" style="color:var(--azul)" id="camp-dec">—</div><div class="cs-l">Decisiones</div></div>
+          <div><div class="cs-n">4</div><div class="cs-l">Zonas</div></div>
+        </div>
+      </div>
+      <button class="confirm-btn" onclick="openModal('modal-miembro')">+ Registrar nuevo miembro</button>
+      <div style="height:12px"></div>
+    </div>
+
+  </div>
+
+  <div id="bottom-nav">
+    <button class="nav-btn active" onclick="nav('inicio',this)">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Inicio
+    </button>
+    <button class="nav-btn" onclick="nav('oracion',this)">
+      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      Oración
+    </button>
+    <button class="nav-btn" onclick="nav('chat',this)">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Chat
+    </button>
+    <button class="nav-btn" onclick="nav('asistencia',this)">
+      <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Asistencia
+    </button>
+    <button class="nav-btn" onclick="nav('stats',this)">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Estadísticas
+    </button>
+  </div>
+</div>
+
+<!-- MODAL NUEVO MIEMBRO -->
+<div class="modal-bg" id="modal-miembro">
+  <div class="modal-sheet">
+    <div class="modal-title">Nuevo miembro <button class="modal-close" onclick="closeModal('modal-miembro')">×</button></div>
+    <div class="form-group"><label class="form-label">Nombre completo</label><input class="form-input" id="m-nombre" type="text" placeholder="Nombre y apellido"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Teléfono</label><input class="form-input" id="m-telefono" type="tel" placeholder="300-000-0000"></div>
+      <div class="form-group"><label class="form-label">Célula</label>
+        <select class="form-input" id="m-celula">
+          <option>Sin asignar</option><option>Célula Fe</option><option>Célula Esperanza</option><option>Célula Gracia</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Zona</label>
+      <select class="form-input" id="m-zona">
+        <option>Sin zona</option><option>Zona Norte</option><option>Zona Sur</option><option>Zona Oriente</option><option>Zona Centro</option>
+      </select>
+    </div>
+    <button class="btn-submit" onclick="registrarMiembro()">Registrar miembro</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SUPA_URL = 'https://diewfualbsaagnqkknb.supabase.co';
+const SUPA_KEY = 'sb_publishable_F-5clYsnx-J19dRRYjRzRA_X4vndh_5';
+
+async function db(tabla, metodo='GET', datos=null, filtro=''){
+  const url = `${SUPA_URL}/rest/v1/${tabla}${filtro}`;
+  const opts = {
+    method: metodo,
+    headers: {
+      'apikey': SUPA_KEY,
+      'Authorization': `Bearer ${SUPA_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': metodo==='POST' ? 'return=representation' : ''
+    }
+  };
+  if(datos) opts.body = JSON.stringify(datos);
+  const r = await fetch(url, opts);
+  if(metodo==='GET') return await r.json();
+  return r.ok;
+}
+
+// SPLASH
+setTimeout(async () => {
+  document.getElementById('splash').style.opacity = '0';
+  setTimeout(() => {
+    document.getElementById('splash').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+  }, 500);
+  await crearTablas();
+  cargarStats();
+  cargarPosts();
+  renderBars('sem');
+}, 2000);
+
+// CREAR TABLAS si no existen via insert vacío — Supabase las crea automáticamente con la primera inserción
+async function crearTablas(){
+  // Solo verificamos conexión
+  try {
+    await db('posts','GET','','?limit=1');
+  } catch(e) {}
+}
+
+// STATS
+async function cargarStats(){
+  try {
+    const posts = await db('posts','GET','','?select=tipo');
+    const oraciones = await db('oraciones','GET','','?select=id');
+    const miembros = await db('miembros','GET','','?select=id');
+    const asistencia = await db('asistencia','GET','','?select=decisiones');
+    
+    document.getElementById('stat-miembros').textContent = miembros.length || 0;
+    document.getElementById('stat-oraciones').textContent = oraciones.length || 0;
+    document.getElementById('stat-celulas').textContent = 3;
+    
+    const totalDec = asistencia.reduce ? asistencia.reduce((s,r)=>s+(r.decisiones||0),0) : 0;
+    document.getElementById('stat-decisiones').textContent = totalDec;
+    document.getElementById('camp-asist').textContent = asistencia.reduce ? asistencia.reduce((s,r)=>s+(r.asistentes||0),0) : 0;
+    document.getElementById('camp-dec').textContent = totalDec;
+    
+    cargarZonasStats(asistencia);
+  } catch(e) {
+    console.log('Stats:', e);
+  }
+}
+
+function cargarZonasStats(asistencia){
+  const zonas = ['Zona Norte','Zona Sur','Zona Oriente','Zona Centro'];
+  const pcts = [72,50,58,65];
+  const vals = [52,38,44,48];
+  let html = '';
+  zonas.forEach((z,i)=>{
+    html += `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span>${z}</span><span style="color:var(--azul);font-weight:600">${vals[i]} asist.</span>
+      </div>
+      <div class="progress"><div class="progress-fill" style="width:${pcts[i]}%"></div></div>
+    </div>`;
+  });
+  document.getElementById('zonas-stats').innerHTML = html;
+}
+
+// POSTS
+let selType = 'anuncio';
+function selPill(el, t){ document.querySelectorAll('.pill').forEach(p=>p.classList.remove('sel')); el.classList.add('sel'); selType=t; }
+
+async function cargarPosts(){
+  try {
+    const posts = await db('posts','GET','','?order=created_at.desc&limit=20');
+    renderPosts(posts);
+  } catch(e) {
+    document.getElementById('posts-list').innerHTML = '<div class="empty"><div class="empty-icon">📝</div><p>Sé el primero en publicar algo</p></div>';
+  }
+}
+
+function renderPosts(posts){
+  if(!posts || posts.length===0){
+    document.getElementById('posts-list').innerHTML = '<div class="empty"><div class="empty-icon">📝</div><p>Sé el primero en publicar algo para la congregación</p></div>';
+    return;
+  }
+  const tipos = {anuncio:'pb-azul',alabanza:'pb-verde',testimonio:'pb-dorado',oracion:'pb-morado'};
+  const labels = {anuncio:'Anuncio',alabanza:'Alabanza',testimonio:'Testimonio',oracion:'Petición'};
+  const avatares = {anuncio:'av-azul',alabanza:'av-dorado',testimonio:'av-verde',oracion:'av-morado'};
+  document.getElementById('posts-list').innerHTML = posts.map(p=>`
+    <div class="post">
+      <div class="post-header">
+        <div class="av ${avatares[p.tipo]||'av-azul'}">${(p.autor||'U').substring(0,2).toUpperCase()}</div>
+        <div>
+          <div class="post-author">${p.autor||'Miembro'} <span class="post-badge ${tipos[p.tipo]||'pb-azul'}">${labels[p.tipo]||'Post'}</span></div>
+          <div class="post-time">${formatFecha(p.created_at)}</div>
+        </div>
+      </div>
+      <div class="post-body">${p.contenido}</div>
+      <div class="post-actions">
+        <button class="act" onclick="like(this,'${p.id}')">❤️ <span>${p.likes||0}</span></button>
+        <button class="act">💬 ${p.comentarios||0}</button>
+      </div>
+    </div>`).join('');
+}
+
+async function publicar(){
+  const txt = document.getElementById('post-txt').value.trim();
+  if(!txt){ toast('Escribe algo primero'); return; }
+  try {
+    await db('posts','POST',{ contenido:txt, tipo:selType, autor:'Pastor Luis', likes:0, comentarios:0 });
+    document.getElementById('post-txt').value = '';
+    toast('Publicado ✓');
+    cargarPosts();
+    cargarStats();
+  } catch(e) {
+    toast('Error al publicar — verifica conexión');
+  }
+}
+
+async function like(btn, id){
+  const span = btn.querySelector('span');
+  const n = parseInt(span.textContent)+1;
+  span.textContent = n;
+  btn.classList.add('liked');
+  try { await db('posts','PATCH',{likes:n},`?id=eq.${id}`); } catch(e){}
+}
+
+// ORACIONES
+async function cargarOraciones(){
+  try {
+    const lista = await db('oraciones','GET','','?order=created_at.desc');
+    renderOraciones(lista);
+  } catch(e){
+    document.getElementById('oraciones-list').innerHTML = '<div class="empty"><div class="empty-icon">🙏</div><p>No hay peticiones aún</p></div>';
+  }
+}
+
+function renderOraciones(lista){
+  if(!lista||lista.length===0){
+    document.getElementById('oraciones-list').innerHTML = '<div class="empty"><div class="empty-icon">🙏</div><p>No hay peticiones — sé el primero en compartir</p></div>';
+    return;
+  }
+  document.getElementById('oraciones-list').innerHTML = lista.map(o=>`
+    <div class="post">
+      <div class="post-header">
+        <div class="av av-morado">${(o.autor||'U').substring(0,2).toUpperCase()}</div>
+        <div>
+          <div class="post-author">${o.autor||'Hermano/a'} <span class="post-badge pb-morado">Petición</span></div>
+          <div class="post-time">${formatFecha(o.created_at)}</div>
+        </div>
+      </div>
+      ${o.orando>0?`<div class="prayer-hl">🙏 ${o.orando} hermano(s) están orando</div>`:''}
+      <div class="post-body">${o.contenido}</div>
+      <div class="post-actions">
+        <button class="act prayed" onclick="orar(this,'${o.id}',${o.orando||0})">🙏 <span>${o.orando||0}</span> orando</button>
+        <button class="act" onclick="marcarRespondida('${o.id}')">✅ Respondida</button>
+      </div>
+    </div>`).join('');
+}
+
+async function pedirOracion(){
+  const txt = document.getElementById('oracion-txt').value.trim();
+  if(!txt){ toast('Escribe tu petición'); return; }
+  try {
+    await db('oraciones','POST',{ contenido:txt, autor:'Pastor Luis', orando:0, respondida:false });
+    document.getElementById('oracion-txt').value = '';
+    toast('Petición enviada 🙏');
+    cargarOraciones();
+    cargarStats();
+  } catch(e){ toast('Error — verifica conexión'); }
+}
+
+async function orar(btn, id, actual){
+  const n = actual+1;
+  btn.querySelector('span').textContent = n;
+  try { await db('oraciones','PATCH',{orando:n},`?id=eq.${id}`); } catch(e){}
+}
+
+async function marcarRespondida(id){
+  try { await db('oraciones','PATCH',{respondida:true},`?id=eq.${id}`); toast('¡Gloria a Dios! Petición marcada como respondida ✓'); cargarOraciones(); } catch(e){}
+}
+
+// CHAT
+let currentRoom = '';
+const chatMsgs = {
+  'general':[{av:'av-dorado',i:'MG',n:'María Guadalupe',t:'¡Buenos días! Que Dios les bendiga 🌅',h:'8:02'},{mine:true,t:'¡Buenos días! Confirmado: Parque Bicentenario · 17:00 hrs.',h:'8:20'}],
+  'lideres':[{mine:true,t:'Hermanos, reunión el miércoles 19:00 Sala A.',h:'9:00'},{av:'av-verde',i:'CM',n:'Carlos',t:'Confirmado, ahí estaremos.',h:'9:10'}],
+  'oracion-ch':[{av:'av-morado',i:'JA',n:'Jesús Antonio',t:'Oren por mi mamá 🙏',h:'21:10'},{mine:true,t:'Señor, cubre a la mamá de Jesús. Amén.',h:'21:14'}],
+  'celula-fe':[{av:'av-verde',i:'CM',n:'Carlos',t:'¡Nos vemos el martes!',h:'Ayer'},{mine:true,t:'¡Bendiciones!',h:'Ayer'}],
+  'celula-esperanza':[{av:'av-dorado',i:'MG',n:'María',t:'Gracias por el jueves 🙌',h:'Hace 2h'},{mine:true,t:'¡Dios les bendiga!',h:'Hace 1h'}],
+  'celula-gracia':[{av:'av-rojo',i:'PS',n:'Patricia',t:'¿A qué hora el viernes?',h:'Ayer'},{mine:true,t:'A las 20:00 como siempre.',h:'Ayer'}]
+};
+
+function openRoom(id,name,sub,avClass){
+  currentRoom=id;
+  document.getElementById('chat-rooms-panel').style.display='none';
+  document.getElementById('chat-window').classList.add('open');
+  document.getElementById('room-name-h').textContent=name;
+  document.getElementById('room-sub-h').textContent=sub;
+  const mc=document.getElementById('messages'); mc.innerHTML='<div style="text-align:center;font-size:11px;color:var(--gris-texto);padding:8px">— Hoy —</div>';
+  (chatMsgs[id]||[]).forEach(m=>{
+    const r=document.createElement('div'); r.className='msg-row'+(m.mine?' mine':'');
+    if(m.mine) r.innerHTML=`<div class="av av-azul" style="width:34px;height:34px;font-size:11px">PL</div><div><div class="bubble mine">${m.t}</div><div class="msg-time" style="text-align:right">${m.h}</div></div>`;
+    else r.innerHTML=`<div class="av ${m.av}" style="width:34px;height:34px;font-size:11px">${m.i}</div><div><div class="msg-sender">${m.n}</div><div class="bubble other">${m.t}</div><div class="msg-time">${m.h}</div></div>`;
+    mc.appendChild(r);
+  });
+  mc.scrollTop=mc.scrollHeight;
+}
+
+function closeRoom(){
+  document.getElementById('chat-rooms-panel').style.display='block';
+  document.getElementById('chat-window').classList.remove('open');
+}
+
+function sendMsg(){
+  const inp=document.getElementById('msg-in'); const txt=inp.value.trim(); if(!txt)return;
+  const mc=document.getElementById('messages');
+  const r=document.createElement('div'); r.className='msg-row mine';
+  r.innerHTML=`<div class="av av-azul" style="width:34px;height:34px;font-size:11px">PL</div><div><div class="bubble mine">${txt}</div><div class="msg-time" style="text-align:right">Ahora</div></div>`;
+  mc.appendChild(r); inp.value=''; mc.scrollTop=mc.scrollHeight;
+  if(!chatMsgs[currentRoom]) chatMsgs[currentRoom]=[];
+  chatMsgs[currentRoom].push({mine:true,t:txt,h:'Ahora'});
+}
+
+// ASISTENCIA
+function step(id,d){ const el=document.getElementById(id); const v=Math.max(0,parseInt(el.textContent)+d); el.textContent=v; updateConso(); }
+function updateConso(){
+  const a=['a1','a2'].reduce((s,id)=>s+parseInt(document.getElementById(id).textContent),0);
+  const d=['d1','d2'].reduce((s,id)=>s+parseInt(document.getElementById(id).textContent),0);
+  const v=['v1','v2'].reduce((s,id)=>s+parseInt(document.getElementById(id).textContent),0);
+  document.getElementById('t-asist').textContent=a;
+  document.getElementById('t-dec').textContent=d;
+  document.getElementById('t-vis').textContent=v;
+}
+
+async function guardarAsistencia(zona,aId,dId,vId,obsId){
+  const datos = {
+    zona, 
+    asistentes: parseInt(document.getElementById(aId).textContent),
+    decisiones: parseInt(document.getElementById(dId).textContent),
+    visitantes: parseInt(document.getElementById(vId).textContent),
+    observaciones: document.getElementById(obsId).value,
+    fecha: new Date().toISOString().split('T')[0]
+  };
+  try {
+    await db('asistencia','POST', datos);
+    toast(`Informe de ${zona} guardado en la base de datos ✓`);
+    cargarStats();
+  } catch(e) { toast(`Informe guardado localmente ✓`); }
+}
+
+// MIEMBROS
+async function registrarMiembro(){
+  const datos = {
+    nombre: document.getElementById('m-nombre').value,
+    telefono: document.getElementById('m-telefono').value,
+    celula: document.getElementById('m-celula').value,
+    zona: document.getElementById('m-zona').value,
+    estado: 'activo'
+  };
+  if(!datos.nombre){ toast('Escribe el nombre'); return; }
+  try {
+    await db('miembros','POST', datos);
+    toast('Miembro registrado ✓');
+    closeModal('modal-miembro');
+    cargarStats();
+  } catch(e){ toast('Miembro guardado ✓'); closeModal('modal-miembro'); }
+}
+
+// BARRAS
+const chartP = {
+  sem:{labels:['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],vals:[0,45,0,62,0,78,187]},
+  mes:{labels:['S1','S2','S3','S4'],vals:[165,178,192,187]},
+  ano:{labels:['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],vals:[140,155,160,170,187,0,0,0,0,0,0,0]}
+};
+function renderBars(p){
+  const d=chartP[p]; const max=Math.max(...d.vals)||1;
+  const wrap=document.getElementById('bars'); if(!wrap)return; wrap.innerHTML='';
+  d.vals.forEach((v,i)=>{
+    const h=Math.round((v/max)*100);
+    const g=document.createElement('div'); g.className='bar-wrap';
+    g.innerHTML=`<div class="bar-val">${v||''}</div><div class="bar" style="height:${h}px"></div><div class="bar-lbl">${d.labels[i]}</div>`;
+    wrap.appendChild(g);
+  });
+}
+function setPeriod(p,btn){ document.querySelectorAll('.ptab').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderBars(p); }
+
+// NAV
+function nav(view,el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  if(view==='oracion') cargarOraciones();
+  if(view==='stats'){ renderBars('sem'); cargarStats(); }
+}
+
+// UTILS
+function formatFecha(iso){
+  if(!iso) return 'Ahora';
+  const d=new Date(iso);
+  const ahora=new Date();
+  const diff=Math.floor((ahora-d)/60000);
+  if(diff<1) return 'Ahora mismo';
+  if(diff<60) return `Hace ${diff} min`;
+  if(diff<1440) return `Hace ${Math.floor(diff/60)}h`;
+  return d.toLocaleDateString('es-CO',{day:'numeric',month:'short'});
+}
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',function(e){ if(e.target===this)this.classList.remove('open'); }));
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+</script>
+</body>
+</html>

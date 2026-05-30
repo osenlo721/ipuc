@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#009FDA">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="IPUC Algarrobo">
+<title>IPUC Algarrobo</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{
+  --azul:#009FDA;
+  --oscuro:#003B6F;
+  --dorado:#F0AB00;
+  --dorado-d:#b8860b;
+  --gris:#f4f6f9;
+  --gris-b:#e8eaed;
+  --gris-t:#666;
+  --texto:#1a1a2e;
+  --sombra:0 2px 12px rgba(0,63,111,0.12);
+  --radio:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--gris);color:var(--texto);overflow:hidden;height:100vh}
+
+/* SPLASH */
+#splash{position:fixed;inset:0;background:linear-gradient(160deg,var(--oscuro),var(--azul));display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity .5s}
+#splash h1{color:white;font-size:22px;font-weight:700;margin-top:16px}
+#splash p{color:rgba(255,255,255,.75);font-size:12px;margin-top:4px}
+#splash .lema{color:var(--dorado);font-size:11px;margin-top:14px;font-style:italic}
+.logo-svg{width:100px;height:100px;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+
+/* LOGIN */
+#login-screen{display:none;position:fixed;inset:0;background:linear-gradient(160deg,var(--oscuro),var(--azul));align-items:center;justify-content:center;z-index:90;flex-direction:column;padding:24px}
+#login-screen.show{display:flex}
+.login-card{background:rgba(255,255,255,.07);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:32px 24px;width:100%;max-width:340px;text-align:center}
+.login-title{font-size:24px;font-weight:800;color:white;margin:14px 0 4px}
+.login-sub{font-size:12px;color:rgba(255,255,255,.6);margin-bottom:28px}
+.btn-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;border:1px solid rgba(255,255,255,.25);border-radius:12px;background:rgba(255,255,255,.1);cursor:pointer;font-size:14px;font-weight:600;color:white;transition:background .2s}
+.btn-google:active{background:rgba(255,255,255,.2)}
+.login-note{font-size:11px;color:rgba(255,255,255,.4);margin-top:16px}
+
+/* APP */
+#app{display:none;flex-direction:column;height:100vh}
+#header{background:linear-gradient(90deg,var(--oscuro),var(--azul));padding:11px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.logo-sm{width:32px;height:32px}
+.htitle h2{color:white;font-size:14px;font-weight:700}
+.htitle p{color:rgba(255,255,255,.7);font-size:9px}
+.h-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.av-user{width:32px;height:32px;border-radius:50%;background:var(--dorado);color:var(--oscuro);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;overflow:hidden;flex-shrink:0}
+.av-user img{width:100%;height:100%;object-fit:cover}
+.btn-logout{background:rgba(255,255,255,.2);border:none;color:white;font-size:10px;padding:4px 8px;border-radius:8px;cursor:pointer}
+
+/* CONTENT */
+#content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:64px}
+
+/* BOTTOM NAV */
+#bottom-nav{background:white;border-top:1px solid var(--gris-b);display:flex;position:fixed;bottom:0;left:0;right:0;height:60px;box-shadow:0 -2px 10px rgba(0,0,0,.08);z-index:50}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 4px;cursor:pointer;color:var(--gris-t);gap:3px;border:none;background:none;font-size:9px;font-weight:600;transition:color .15s}
+.nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
+.nav-btn.active{color:var(--azul)}
+
+/* VIEWS */
+.view{display:none;padding:12px}
+.view.active{display:block}
+
+/* SECTION HEADER */
+.sec-header{background:linear-gradient(135deg,var(--oscuro),var(--azul));border-radius:var(--radio);padding:18px;margin-bottom:12px;text-align:center;color:white}
+.sec-header h3{font-size:15px;font-weight:700}
+.sec-header p{font-size:11px;opacity:.8;margin-top:3px}
+
+/* CARD */
+.card{background:white;border-radius:var(--radio);padding:14px;margin-bottom:10px;box-shadow:var(--sombra)}
+
+/* MURO / FEED */
+.compose{background:white;border-radius:var(--radio);padding:14px;margin-bottom:10px;box-shadow:var(--sombra)}
+.compose-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.compose textarea{flex:1;border:1px solid var(--gris-b);border-radius:8px;padding:10px;font-size:13px;resize:none;height:70px;font-family:inherit;color:var(--texto)}
+.compose textarea:focus{outline:none;border-color:var(--azul)}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.pill{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--gris-b);cursor:pointer;background:var(--gris);color:var(--gris-t)}
+.pill.sel{background:var(--azul);color:white;border-color:var(--azul)}
+.btn-pub{background:var(--azul);color:white;border:none;padding:9px 20px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;float:right}
+.post{background:white;border-radius:var(--radio);padding:14px;margin-bottom:10px;box-shadow:var(--sombra)}
+.post-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:white;overflow:hidden}
+.av img{width:100%;height:100%;object-fit:cover}
+.av-azul{background:var(--azul)}
+.av-dorado{background:var(--dorado);color:var(--oscuro)}
+.av-verde{background:#1D9E75}
+.av-morado{background:#534AB7}
+.post-autor{font-size:13px;font-weight:600;color:var(--texto)}
+.post-time{font-size:11px;color:var(--gris-t)}
+.post-body{font-size:13px;line-height:1.6;color:var(--texto);margin-bottom:10px}
+.post-badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;display:inline-block;margin-left:4px}
+.pb-azul{background:#E6F1FB;color:#185FA5}
+.pb-dorado{background:#FFF3CC;color:#854F0B}
+.pb-verde{background:#E1F5EE;color:#0F6E56}
+.pb-morado{background:#EEEDFE;color:#3C3489}
+.post-acts{display:flex;gap:6px;border-top:1px solid var(--gris-b);padding-top:10px}
+.act-btn{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--gris-t);cursor:pointer;border:none;background:none;padding:5px 10px;border-radius:20px}
+.act-btn:active{background:var(--gris)}
+.act-btn.liked{color:#e41c1c}
+
+/* CHAT */
+#view-chat{padding:0}
+.chat-rooms{padding:12px}
+.room-item{background:white;border-radius:var(--radio);padding:12px;margin-bottom:8px;box-shadow:var(--sombra);display:flex;align-items:center;gap:10px;cursor:pointer}
+.room-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;color:white}
+.room-name{font-size:13px;font-weight:600;color:var(--texto)}
+.room-sub{font-size:11px;color:var(--gris-t);margin-top:2px}
+.chat-window{display:none;flex-direction:column;height:calc(100vh - 60px)}
+.chat-window.open{display:flex}
+.chat-topbar{background:linear-gradient(90deg,var(--oscuro),var(--azul));padding:11px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.chat-back{background:none;border:none;color:white;font-size:24px;cursor:pointer;line-height:1}
+.cname{font-size:14px;font-weight:600;color:white}
+.csub{font-size:11px;color:rgba(255,255,255,.7)}
+.messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--gris)}
+.msg-row{display:flex;gap:8px;align-items:flex-end}
+.msg-row.mine{flex-direction:row-reverse}
+.bubble{max-width:75%;padding:9px 13px;border-radius:16px;font-size:13px;line-height:1.5;word-break:break-word}
+.bubble.other{background:white;color:var(--texto);border-bottom-left-radius:4px;box-shadow:var(--sombra)}
+.bubble.mine{background:var(--azul);color:white;border-bottom-right-radius:4px}
+.msg-sender{font-size:10px;color:var(--gris-t);margin-bottom:3px}
+.msg-time{font-size:10px;color:var(--gris-t);margin-top:3px;text-align:right}
+.bubble.other .msg-time{text-align:left}
+.chat-bar{display:flex;gap:8px;padding:10px 12px;background:white;border-top:1px solid var(--gris-b);flex-shrink:0}
+.chat-input{flex:1;border:1px solid var(--gris-b);border-radius:24px;padding:9px 16px;font-size:13px;font-family:inherit;color:var(--texto);outline:none}
+.chat-input:focus{border-color:var(--azul)}
+.btn-send{background:var(--azul);color:white;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+
+/* CULTOS */
+.culto-selector{background:white;border-radius:var(--radio);padding:14px;margin-bottom:10px;box-shadow:var(--sombra)}
+.culto-selector-title{font-size:12px;font-weight:700;color:var(--oscuro);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.culto-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.ctab{font-size:12px;padding:7px 14px;border-radius:20px;border:1.5px solid var(--gris-b);cursor:pointer;background:var(--gris);color:var(--gris-t);font-weight:600;transition:all .15s}
+.ctab.active{background:var(--azul);color:white;border-color:var(--azul)}
+.zone-block{background:white;border-radius:var(--radio);padding:14px;margin-bottom:10px;box-shadow:var(--sombra)}
+.zone-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.zone-name{font-size:14px;font-weight:700;color:var(--oscuro)}
+.zone-sub{font-size:11px;color:var(--gris-t);margin-top:1px}
+.counters{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.counter{text-align:center}
+.counter-lbl{font-size:9px;color:var(--gris-t);margin-bottom:5px;font-weight:600;text-transform:uppercase}
+.counter-ctrl{display:flex;align-items:center;justify-content:center;gap:4px}
+.c-btn{width:28px;height:28px;border:1px solid var(--gris-b);border-radius:8px;background:var(--gris);font-size:16px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
+.c-btn:active{background:var(--gris-b)}
+.c-val{font-size:18px;font-weight:700;color:var(--oscuro);min-width:32px;text-align:center}
+.obs-input{width:100%;border:1px solid var(--gris-b);border-radius:8px;padding:8px 10px;font-size:12px;font-family:inherit;resize:none;height:50px;color:var(--texto)}
+.obs-input:focus{outline:none;border-color:var(--azul)}
+.btn-guardar{background:linear-gradient(90deg,var(--oscuro),var(--azul));color:white;border:none;width:100%;padding:11px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:10px}
+.consolidado{background:linear-gradient(135deg,var(--oscuro),var(--azul));border-radius:var(--radio);padding:16px;margin-bottom:10px;color:white}
+.consolidado h3{font-size:12px;opacity:.85;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.conso-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
+.conso-n{font-size:22px;font-weight:700}
+.conso-l{font-size:9px;opacity:.75;margin-top:2px;text-transform:uppercase}
+
+/* ESTADÍSTICAS */
+.stat-tabs{display:flex;gap:6px;margin-bottom:12px}
+.stab{font-size:11px;padding:5px 16px;border-radius:20px;border:1px solid var(--gris-b);cursor:pointer;background:var(--gris);color:var(--gris-t);font-weight:500}
+.stab.active{background:var(--azul);color:white;border-color:var(--azul)}
+.bars{display:flex;align-items:flex-end;gap:5px;height:110px;margin-bottom:8px}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bar{width:100%;background:linear-gradient(to top,var(--oscuro),var(--azul));border-radius:4px 4px 0 0;min-height:4px;transition:height .3s}
+.bar-lbl{font-size:9px;color:var(--gris-t)}
+.bar-val{font-size:9px;color:var(--oscuro);font-weight:700}
+.progress{height:8px;background:var(--gris-b);border-radius:4px;overflow:hidden;margin:4px 0}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--azul),var(--dorado));border-radius:4px;transition:width .4s}
+.stat-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:2px}
+.stat-row span:last-child{font-weight:700;color:var(--azul)}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end}
+.modal-bg.open{display:flex}
+.modal-sheet{background:white;border-radius:20px 20px 0 0;padding:20px;width:100%;max-height:85vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:700;color:var(--oscuro);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.modal-close{color:var(--gris-t);cursor:pointer;font-size:24px;background:none;border:none;line-height:1}
+.form-group{margin-bottom:12px}
+.form-label{font-size:12px;color:var(--gris-t);margin-bottom:4px;display:block;font-weight:600}
+.form-input{width:100%;border:1.5px solid var(--gris-b);border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;color:var(--texto)}
+.form-input:focus{outline:none;border-color:var(--azul)}
+.btn-submit{background:linear-gradient(90deg,var(--oscuro),var(--azul));color:white;border:none;width:100%;padding:13px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px}
+
+/* TOAST */
+#toast{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);background:var(--oscuro);color:white;padding:10px 20px;border-radius:24px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:300;white-space:nowrap}
+#toast.show{opacity:1}
+
+/* EMPTY / LOADING */
+.empty{text-align:center;padding:40px 20px;color:var(--gris-t)}
+.empty-icon{font-size:40px;margin-bottom:10px}
+.loading{text-align:center;padding:30px;color:var(--gris-t);font-size:13px}
+.spinner{width:26px;height:26px;border:3px solid var(--gris-b);border-top-color:var(--azul);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <svg class="logo-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="60" cy="60" r="58" fill="#003B6F" stroke="#F0AB00" stroke-width="3"/>
+    <ellipse cx="60" cy="60" rx="30" ry="58" fill="none" stroke="#009FDA" stroke-width="1.5" opacity="0.6"/>
+    <ellipse cx="60" cy="60" rx="58" ry="20" fill="none" stroke="#009FDA" stroke-width="1.5" opacity="0.4"/>
+    <circle cx="60" cy="60" r="20" fill="#009FDA"/>
+    <path d="M48 60 L60 48 L72 60 L60 72 Z" fill="#F0AB00"/>
+    <text x="60" y="100" text-anchor="middle" font-size="8" font-weight="700" fill="#F0AB00" font-family="Arial">IPUC</text>
+    <text x="60" y="111" text-anchor="middle" font-size="5" fill="rgba(255,255,255,0.7)" font-family="Arial">Un Señor, una fe</text>
+  </svg>
+  <h1>IPUC Algarrobo</h1>
+  <p>Iglesia Pentecostal Unida de Colombia</p>
+  <div class="lema">Un Señor, una fe, un bautismo</div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <svg style="width:80px;height:80px" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="60" cy="60" r="58" fill="#003B6F" stroke="#F0AB00" stroke-width="3"/>
+      <circle cx="60" cy="60" r="20" fill="#009FDA"/>
+      <path d="M48 60 L60 48 L72 60 L60 72 Z" fill="#F0AB00"/>
+    </svg>
+    <div class="login-title">IPUC Algarrobo</div>
+    <div class="login-sub">Iglesia Pentecostal Unida de Colombia</div>
+    <button class="btn-google" onclick="loginGoogle()">
+      <svg width="18" height="18" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      Entrar con Google
+    </button>
+    <div class="login-note">Solo miembros autorizados de IPUC Algarrobo</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div id="header">
+    <svg class="logo-sm" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="60" cy="60" r="58" fill="#003B6F" stroke="#F0AB00" stroke-width="2"/>
+      <circle cx="60" cy="60" r="20" fill="#009FDA"/>
+      <path d="M48 60 L60 48 L72 60 L60 72 Z" fill="#F0AB00"/>
+    </svg>
+    <div class="htitle"><h2>IPUC Algarrobo</h2><p>Un Señor, una fe, un bautismo</p></div>
+    <div class="h-right">
+      <div class="av-user" id="user-av" title="Mi perfil">?</div>
+      <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
+    </div>
+  </div>
+
+  <div id="content">
+
+    <!-- INICIO (MURO) -->
+    <div id="view-inicio" class="view active">
+      <div class="sec-header"><h3>🕊️ Muro de la Comunidad</h3><p>Comparte con tu iglesia</p></div>
+      <div class="compose">
+        <div class="compose-row">
+          <div class="av av-azul" id="compose-av">?</div>
+          <textarea id="post-txt" placeholder="Comparte un anuncio, testimonio o alabanza..."></textarea>
+        </div>
+        <div class="pills">
+          <span class="pill sel" onclick="selPill(this,'anuncio')">📢 Anuncio</span>
+          <span class="pill" onclick="selPill(this,'alabanza')">🎵 Alabanza</span>
+          <span class="pill" onclick="selPill(this,'testimonio')">⭐ Testimonio</span>
+          <span class="pill" onclick="selPill(this,'oracion')">🙏 Oración</span>
+        </div>
+        <button class="btn-pub" onclick="publicar()">Publicar</button>
+        <div style="clear:both"></div>
+      </div>
+      <div id="posts-list"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+    </div>
+
+    <!-- CHAT -->
+    <div id="view-chat" class="view" style="padding:0">
+      <div id="chat-rooms-panel">
+        <div class="chat-rooms">
+          <div class="sec-header" style="border-radius:var(--radio);margin:12px 12px 10px"><h3>💬 Chat</h3><p>Canales de comunicación</p></div>
+          <div style="padding:0 0 6px;font-size:10px;color:var(--gris-t);font-weight:700;text-transform:uppercase;letter-spacing:.5px">General</div>
+          <div class="room-item" onclick="openRoom('general','General','Toda la congregación','av-azul','GN')">
+            <div class="room-av av-azul">GN</div>
+            <div><div class="room-name">General</div><div class="room-sub">Canal de toda la iglesia</div></div>
+          </div>
+          <div class="room-item" onclick="openRoom('lideres','Líderes','Líderes y pastores','av-dorado','LZ')">
+            <div class="room-av av-dorado" style="color:var(--oscuro)">LZ</div>
+            <div><div class="room-name">Líderes de zona</div><div class="room-sub">Canal de líderes</div></div>
+          </div>
+          <div class="room-item" onclick="openRoom('oracion-ch','Oración','Intercesión y peticiones','av-morado','🙏')">
+            <div class="room-av av-morado">🙏</div>
+            <div><div class="room-name">Oración</div><div class="room-sub">Intercesión y peticiones</div></div>
+          </div>
+          <div style="padding:12px 0 6px;font-size:10px;color:var(--gris-t);font-weight:700;text-transform:uppercase;letter-spacing:.5px">Cultos</div>
+          <div class="room-item" onclick="openRoom('culto-domingo','Domingo','Canal del culto dominical','av-verde','☀️')">
+            <div class="room-av av-verde">☀️</div>
+            <div><div class="room-name">Culto Domingo</div><div class="room-sub">Culto dominical</div></div>
+          </div>
+          <div class="room-item" onclick="openRoom('culto-miercoles','Miércoles','Canal del culto de miércoles','av-azul','🕊️')">
+            <div class="room-av av-azul">🕊️</div>
+            <div><div class="room-name">Culto Miércoles</div><div class="room-sub">Culto de mitad de semana</div></div>
+          </div>
+          <div class="room-item" onclick="openRoom('culto-viernes','Viernes','Canal del culto de viernes','av-morado','✝️')">
+            <div class="room-av av-morado">✝️</div>
+            <div><div class="room-name">Culto Viernes</div><div class="room-sub">Culto de viernes</div></div>
+          </div>
+        </div>
+      </div>
+      <div id="chat-window" class="chat-window">
+        <div class="chat-topbar">
+          <button class="chat-back" onclick="closeRoom()">←</button>
+          <div><div class="cname" id="room-name-h"></div><div class="csub" id="room-sub-h"></div></div>
+        </div>
+        <div class="messages" id="messages"></div>
+        <div class="chat-bar">
+          <input class="chat-input" id="msg-in" placeholder="Escribe un mensaje..." onkeydown="if(event.key==='Enter')sendMsg()">
+          <button class="btn-send" onclick="sendMsg()">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CULTOS / ASISTENCIA -->
+    <div id="view-cultos" class="view">
+      <div class="sec-header"><h3>✝️ Registro de Cultos</h3><p>Asistencia por culto y zona</p></div>
+
+      <!-- Selector de culto -->
+      <div class="culto-selector">
+        <div class="culto-selector-title">📅 Selecciona el culto</div>
+        <div class="culto-tabs">
+          <button class="ctab active" onclick="selCulto(this,'domingo-matutino')">☀️ Dom. Matutino</button>
+          <button class="ctab" onclick="selCulto(this,'domingo-vespertino')">🌆 Dom. Vespertino</button>
+          <button class="ctab" onclick="selCulto(this,'miercoles')">🕊️ Miércoles</button>
+          <button class="ctab" onclick="selCulto(this,'viernes')">✝️ Viernes</button>
+          <button class="ctab" onclick="selCulto(this,'matutino')">🌅 Matutino</button>
+        </div>
+      </div>
+
+      <!-- Consolidado del día -->
+      <div class="consolidado">
+        <h3>📊 Consolidado del culto</h3>
+        <div class="conso-grid">
+          <div><div class="conso-n" id="t-herm">0</div><div class="conso-l">Hermanos</div></div>
+          <div><div class="conso-n" id="t-herm2">0</div><div class="conso-l">Hermanas</div></div>
+          <div><div class="conso-n" id="t-ninos">0</div><div class="conso-l">Niños</div></div>
+          <div><div class="conso-n" id="t-vis">0</div><div class="conso-l">Visitas</div></div>
+        </div>
+      </div>
+
+      <!-- Zonas -->
+      <div id="zonas-container"></div>
+
+      <div style="height:8px"></div>
+    </div>
+
+    <!-- ESTADÍSTICAS -->
+    <div id="view-stats" class="view">
+      <div class="sec-header"><h3>📈 Estadísticas</h3><p>Crecimiento de la congregación</p></div>
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;color:var(--oscuro);margin-bottom:10px">📊 Asistencia total</div>
+        <div class="stat-tabs">
+          <button class="stab active" onclick="setPeriod('sem',this)">Semana</button>
+          <button class="stab" onclick="setPeriod('mes',this)">Mes</button>
+          <button class="stab" onclick="setPeriod('ano',this)">Año</button>
+        </div>
+        <div class="bars" id="bars"></div>
+      </div>
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;color:var(--oscuro);margin-bottom:12px">📋 Por tipo de asistente</div>
+        <div id="stats-detalle"></div>
+      </div>
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;color:var(--oscuro);margin-bottom:12px">🏆 Por zona</div>
+        <div id="stats-zonas"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div id="bottom-nav">
+    <button class="nav-btn active" onclick="nav('inicio',this)">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Inicio
+    </button>
+    <button class="nav-btn" onclick="nav('chat',this)">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Chat
+    </button>
+    <button class="nav-btn" onclick="nav('cultos',this)">
+      <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Cultos
+    </button>
+    <button class="nav-btn" onclick="nav('stats',this)">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Estadísticas
+    </button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, query, orderBy, limit, onSnapshot, serverTimestamp, where } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+
+const firebaseConfig = {
+  apiKey: "REEMPLAZAR_API_KEY",
+  authDomain: "ipuc-algarrobo.firebaseapp.com",
+  projectId: "ipuc-algarrobo",
+  storageBucket: "ipuc-algarrobo.appspot.com",
+  messagingSenderId: "REEMPLAZAR_SENDER_ID",
+  appId: "REEMPLAZAR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+// ─── Estado ────────────────────────────────────────────────────────
+let currentUser = null;
+let postTipo = 'anuncio';
+let cultoActivo = 'domingo-matutino';
+let roomActivo = null;
+let chatUnsub = null;
+
+// ─── Zonas y cultos ────────────────────────────────────────────────
+const ZONAS_BASE = ['Zona 1','Zona 2','Zona 3','Zona 4','Zona 5','Zona 6','Zona 7','Zona 8 - Estación Villa'];
+
+const ZONAS = {
+  'domingo-matutino':  ZONAS_BASE,
+  'domingo-vespertino':ZONAS_BASE,
+  'miercoles':         [...ZONAS_BASE, 'Matutino'],
+  'viernes':           [...ZONAS_BASE, 'Matutino'],
+  'matutino':          ZONAS_BASE,
+};
+
+const CULTO_LABELS = {
+  'domingo-matutino':  '☀️ Dom. Matutino',
+  'domingo-vespertino':'🌆 Dom. Vespertino',
+  'miercoles':         '🕊️ Miércoles',
+  'viernes':           '✝️ Viernes',
+  'matutino':          '🌅 Matutino',
+};
+
+const AV_COLORS = ['av-azul','av-dorado','av-verde','av-morado','av-azul','av-verde'];
+
+// ─── AUTH ──────────────────────────────────────────────────────────
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    currentUser = user;
+    document.getElementById('login-screen').classList.remove('show');
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('splash').style.display = 'none';
+    const ini = (user.displayName || user.email).substring(0,2).toUpperCase();
+    document.getElementById('user-av').textContent = ini;
+    document.getElementById('compose-av').textContent = ini;
+    if (user.photoURL) {
+      const avEl = document.getElementById('user-av');
+      avEl.innerHTML = `<img src="${user.photoURL}" alt="">`;
+    }
+    await crearPerfilSiNoExiste(user);
+    cargarPosts();
+    renderZonas();
+    cargarStats('sem');
+  } else {
+    currentUser = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('login-screen').classList.add('show');
+  }
+});
+
+setTimeout(() => {
+  if (!currentUser) {
+    document.getElementById('splash').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('splash').style.display = 'none';
+      document.getElementById('login-screen').classList.add('show');
+    }, 500);
+  }
+}, 2000);
+
+async function crearPerfilSiNoExiste(user) {
+  const ref = doc(db,'perfiles',user.uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      nombre: user.displayName || user.email,
+      email: user.email,
+      foto: user.photoURL || null,
+      fechaRegistro: serverTimestamp()
+    });
+  }
+}
+
+window.loginGoogle = async function() {
+  try { await signInWithPopup(auth, provider); }
+  catch(e) { if (e.code !== 'auth/popup-closed-by-user') toast('❌ Error al iniciar sesión'); }
+}
+
+window.cerrarSesion = async function() {
+  await signOut(auth);
+  toast('Sesión cerrada');
+}
+
+// ─── NAVEGACIÓN ────────────────────────────────────────────────────
+window.nav = function(v, el) {
+  document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  if (v === 'inicio')  cargarPosts();
+  if (v === 'cultos')  renderZonas();
+  if (v === 'stats')   cargarStats(periodoActivo);
+}
+
+// ─── MURO ──────────────────────────────────────────────────────────
+window.selPill = function(el, tipo) {
+  postTipo = tipo;
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+window.publicar = async function() {
+  const txt = document.getElementById('post-txt').value.trim();
+  if (!txt) { toast('Escribe algo antes de publicar'); return; }
+  try {
+    await addDoc(collection(db,'posts'), {
+      texto: txt,
+      tipo: postTipo,
+      autor: currentUser.displayName || currentUser.email,
+      uid: currentUser.uid,
+      foto: currentUser.photoURL || null,
+      likes: 0,
+      fecha: serverTimestamp()
+    });
+    document.getElementById('post-txt').value = '';
+    toast('✅ Publicado');
+    cargarPosts();
+  } catch(e) { toast('❌ Error al publicar'); }
+}
+
+async function cargarPosts() {
+  const el = document.getElementById('posts-list');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  try {
+    const q = query(collection(db,'posts'), orderBy('fecha','desc'), limit(30));
+    const snap = await getDocs(q);
+    if (snap.empty) { el.innerHTML = '<div class="empty"><div class="empty-icon">🕊️</div><p>Sé el primero en publicar</p></div>'; return; }
+    const BADGE = {anuncio:'pb-azul',alabanza:'pb-dorado',testimonio:'pb-verde',oracion:'pb-morado'};
+    const LABEL = {anuncio:'📢 Anuncio',alabanza:'🎵 Alabanza',testimonio:'⭐ Testimonio',oracion:'🙏 Oración'};
+    const avCols = ['av-azul','av-dorado','av-verde','av-morado'];
+    let html = ''; let i = 0;
+    snap.forEach(d => {
+      const p = {id:d.id,...d.data()};
+      const fecha = p.fecha?.toDate ? p.fecha.toDate() : new Date();
+      const avC = avCols[i++ % 4];
+      const ini = (p.autor||'?').substring(0,2).toUpperCase();
+      const avHtml = p.foto
+        ? `<div class="av ${avC}"><img src="${p.foto}" alt=""></div>`
+        : `<div class="av ${avC}">${ini}</div>`;
+      html += `<div class="post">
+        <div class="post-hdr">
+          ${avHtml}
+          <div>
+            <div class="post-autor">${esc(p.autor||'Miembro')}<span class="post-badge ${BADGE[p.tipo]||'pb-azul'}">${LABEL[p.tipo]||p.tipo}</span></div>
+            <div class="post-time">${fmt(fecha)}</div>
+          </div>
+        </div>
+        <div class="post-body">${esc(p.texto)}</div>
+        <div class="post-acts">
+          <button class="act-btn" onclick="darLike('${p.id}',${p.likes||0},this)">❤️ ${p.likes||0}</button>
+        </div>
+      </div>`;
+    });
+    el.innerHTML = html;
+  } catch(e) { el.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><p>Error cargando el muro</p></div>'; }
+}
+
+window.darLike = async function(id, actual, btn) {
+  const n = actual + 1;
+  btn.textContent = `❤️ ${n}`;
+  btn.classList.add('liked');
+  try { await updateDoc(doc(db,'posts',id), {likes:n}); } catch(e){}
+}
+
+// ─── CHAT ──────────────────────────────────────────────────────────
+window.openRoom = function(roomId, name, sub, avCls, icon) {
+  roomActivo = roomId;
+  document.getElementById('room-name-h').textContent = name;
+  document.getElementById('room-sub-h').textContent = sub;
+  document.getElementById('chat-rooms-panel').style.display = 'none';
+  document.getElementById('chat-window').classList.add('open');
+  document.getElementById('messages').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+  setTimeout(() => document.getElementById('msg-in').focus(), 200);
+  if (chatUnsub) chatUnsub();
+  const q = query(collection(db,`chats/${roomId}/mensajes`), orderBy('fecha','asc'), limit(100));
+  chatUnsub = onSnapshot(q, snap => {
+    let html = '';
+    snap.forEach(d => {
+      const m = d.data();
+      const esYo = m.uid === currentUser?.uid;
+      const ini = (m.autor||'?').substring(0,2).toUpperCase();
+      const fecha = m.fecha?.toDate ? m.fecha.toDate() : new Date();
+      const avHtml = m.foto
+        ? `<div class="av av-azul" style="width:30px;height:30px;font-size:10px"><img src="${m.foto}" alt=""></div>`
+        : `<div class="av av-azul" style="width:30px;height:30px;font-size:10px">${ini}</div>`;
+      html += `<div class="msg-row ${esYo?'mine':''}">
+        ${!esYo ? avHtml : ''}
+        <div>
+          ${!esYo ? `<div class="msg-sender">${esc(m.autor||'')}</div>` : ''}
+          <div class="bubble ${esYo?'mine':'other'}">${esc(m.texto)}<div class="msg-time">${fmt(fecha)}</div></div>
+        </div>
+      </div>`;
+    });
+    const el = document.getElementById('messages');
+    el.innerHTML = html || '<div style="text-align:center;color:var(--gris-t);font-size:13px;padding:30px">Inicia la conversación 👋</div>';
+    el.scrollTop = el.scrollHeight;
+  });
+}
+
+window.closeRoom = function() {
+  if (chatUnsub) { chatUnsub(); chatUnsub = null; }
+  roomActivo = null;
+  document.getElementById('chat-window').classList.remove('open');
+  document.getElementById('chat-rooms-panel').style.display = '';
+}
+
+window.sendMsg = async function() {
+  const inp = document.getElementById('msg-in');
+  const txt = inp.value.trim();
+  if (!txt || !roomActivo || !currentUser) return;
+  inp.value = '';
+  try {
+    await addDoc(collection(db,`chats/${roomActivo}/mensajes`), {
+      texto: txt,
+      autor: currentUser.displayName || currentUser.email,
+      uid: currentUser.uid,
+      foto: currentUser.photoURL || null,
+      fecha: serverTimestamp()
+    });
+  } catch(e) { toast('❌ Error al enviar'); }
+}
+
+// ─── CULTOS / ASISTENCIA ───────────────────────────────────────────
+window.selCulto = function(btn, culto) {
+  cultoActivo = culto;
+  document.querySelectorAll('.ctab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderZonas();
+}
+
+function renderZonas() {
+  const zonas = ZONAS[cultoActivo] || [];
+  const container = document.getElementById('zonas-container');
+  container.innerHTML = zonas.map((zona, i) => {
+    const avC = AV_COLORS[i % AV_COLORS.length];
+    const ini = zona.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const id = `z${i}`;
+    return `<div class="zone-block">
+      <div class="zone-hdr">
+        <div class="av ${avC}" style="width:40px;height:40px">${ini}</div>
+        <div><div class="zone-name">${zona}</div><div class="zone-sub">${CULTO_LABELS[cultoActivo]||cultoActivo}</div></div>
+      </div>
+      <div class="counters">
+        <div class="counter">
+          <div class="counter-lbl">Hermanos</div>
+          <div class="counter-ctrl">
+            <button class="c-btn" onclick="step('h${id}',-1)">−</button>
+            <div class="c-val" id="h${id}">0</div>
+            <button class="c-btn" onclick="step('h${id}',1)">+</button>
+          </div>
+        </div>
+        <div class="counter">
+          <div class="counter-lbl">Hermanas</div>
+          <div class="counter-ctrl">
+            <button class="c-btn" onclick="step('m${id}',-1)">−</button>
+            <div class="c-val" id="m${id}">0</div>
+            <button class="c-btn" onclick="step('m${id}',1)">+</button>
+          </div>
+        </div>
+        <div class="counter">
+          <div class="counter-lbl">Niños</div>
+          <div class="counter-ctrl">
+            <button class="c-btn" onclick="step('n${id}',-1)">−</button>
+            <div class="c-val" id="n${id}">0</div>
+            <button class="c-btn" onclick="step('n${id}',1)">+</button>
+          </div>
+        </div>
+        <div class="counter">
+          <div class="counter-lbl">Visitas</div>
+          <div class="counter-ctrl">
+            <button class="c-btn" onclick="step('v${id}',-1)">−</button>
+            <div class="c-val" id="v${id}">0</div>
+            <button class="c-btn" onclick="step('v${id}',1)">+</button>
+          </div>
+        </div>
+      </div>
+      <textarea class="obs-input" id="obs${id}" placeholder="Observaciones de ${zona}..."></textarea>
+      <button class="btn-guardar" onclick="guardarZona('${zona}','h${id}','m${id}','n${id}','v${id}','obs${id}')">✓ Guardar ${zona}</button>
+    </div>`;
+  }).join('');
+  actualizarConsolidado();
+}
+
+window.step = function(id, delta) {
+  const el = document.getElementById(id);
+  const val = Math.max(0, parseInt(el.textContent) + delta);
+  el.textContent = val;
+  actualizarConsolidado();
+}
+
+function actualizarConsolidado() {
+  const zonas = ZONAS[cultoActivo] || [];
+  let herm=0, herm2=0, ninos=0, vis=0;
+  zonas.forEach((_, i) => {
+    const id = `z${i}`;
+    herm  += parseInt(document.getElementById('h'+id)?.textContent||0);
+    herm2 += parseInt(document.getElementById('m'+id)?.textContent||0);
+    ninos += parseInt(document.getElementById('n'+id)?.textContent||0);
+    vis   += parseInt(document.getElementById('v'+id)?.textContent||0);
+  });
+  document.getElementById('t-herm').textContent  = herm;
+  document.getElementById('t-herm2').textContent = herm2;
+  document.getElementById('t-ninos').textContent = ninos;
+  document.getElementById('t-vis').textContent   = vis;
+}
+
+window.guardarZona = async function(zona, hId, mId, nId, vId, obsId) {
+  if (!currentUser) { toast('Debes iniciar sesión'); return; }
+  const hermanos  = parseInt(document.getElementById(hId).textContent);
+  const hermanas  = parseInt(document.getElementById(mId).textContent);
+  const ninos     = parseInt(document.getElementById(nId).textContent);
+  const visitas   = parseInt(document.getElementById(vId).textContent);
+  const obs       = document.getElementById(obsId).value;
+  const total     = hermanos + hermanas + ninos + visitas;
+  const fecha     = new Date().toISOString().split('T')[0];
+  try {
+    await addDoc(collection(db,'asistencia'), {
+      culto: cultoActivo,
+      zona, hermanos, hermanas, ninos, visitas, total,
+      observaciones: obs, fecha,
+      registradoPor: currentUser.uid,
+      registradoPorNombre: currentUser.displayName || currentUser.email,
+      timestamp: serverTimestamp()
+    });
+    toast(`✅ ${zona} guardada — ${total} asistentes`);
+  } catch(e) { toast('❌ Error al guardar'); }
+}
+
+// ─── ESTADÍSTICAS ──────────────────────────────────────────────────
+let periodoActivo = 'sem';
+
+window.setPeriod = function(p, btn) {
+  periodoActivo = p;
+  document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  cargarStats(p);
+}
+
+async function cargarStats(periodo) {
+  try {
+    const snap = await getDocs(collection(db,'asistencia'));
+    const registros = [];
+    snap.forEach(d => registros.push(d.data()));
+
+    const hoy = new Date();
+    let filtrados = registros;
+    if (periodo === 'sem') {
+      const hace7 = new Date(hoy); hace7.setDate(hoy.getDate()-6);
+      filtrados = registros.filter(r => r.fecha >= hace7.toISOString().split('T')[0]);
+    } else if (periodo === 'mes') {
+      const mesStr = hoy.toISOString().substring(0,7);
+      filtrados = registros.filter(r => r.fecha && r.fecha.startsWith(mesStr));
+    } else {
+      const anoStr = hoy.getFullYear().toString();
+      filtrados = registros.filter(r => r.fecha && r.fecha.startsWith(anoStr));
+    }
+
+    // Barras por día / semana / mes
+    renderBars(filtrados, periodo);
+
+    // Detalle por tipo
+    const totH = filtrados.reduce((s,r)=>s+(r.hermanos||0),0);
+    const totM = filtrados.reduce((s,r)=>s+(r.hermanas||0),0);
+    const totN = filtrados.reduce((s,r)=>s+(r.ninos||0),0);
+    const totV = filtrados.reduce((s,r)=>s+(r.visitas||0),0);
+    const grand = totH + totM + totN + totV || 1;
+    document.getElementById('stats-detalle').innerHTML = [
+      {lbl:'Hermanos',val:totH,col:'var(--azul)'},
+      {lbl:'Hermanas',val:totM,col:'var(--dorado)'},
+      {lbl:'Niños',val:totN,col:'#1D9E75'},
+      {lbl:'Visitas',val:totV,col:'#534AB7'},
+    ].map(x=>`
+      <div class="stat-row"><span>${x.lbl}</span><span>${x.val}</span></div>
+      <div class="progress"><div class="progress-fill" style="width:${Math.round(x.val/grand*100)}%;background:${x.col}"></div></div>
+    `).join('');
+
+    // Por zona
+    const zonaTotales = {};
+    filtrados.forEach(r => { zonaTotales[r.zona] = (zonaTotales[r.zona]||0) + (r.total||0); });
+    const maxZ = Math.max(...Object.values(zonaTotales),1);
+    document.getElementById('stats-zonas').innerHTML = Object.entries(zonaTotales)
+      .sort((a,b)=>b[1]-a[1])
+      .map(([z,v])=>`
+        <div class="stat-row"><span>${z}</span><span>${v}</span></div>
+        <div class="progress"><div class="progress-fill" style="width:${Math.round(v/maxZ*100)}%"></div></div>
+      `).join('') || '<div style="color:var(--gris-t);font-size:13px">Sin datos aún</div>';
+
+  } catch(e) {
+    document.getElementById('stats-detalle').innerHTML = '<div style="color:var(--gris-t);font-size:13px">Error cargando estadísticas</div>';
+  }
+}
+
+function renderBars(registros, periodo) {
+  const el = document.getElementById('bars');
+  const grupos = {};
+
+  registros.forEach(r => {
+    let key = r.fecha || 'Sin fecha';
+    if (periodo === 'sem') {
+      const d = new Date(r.fecha+'T12:00:00');
+      key = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'][d.getDay()];
+    } else if (periodo === 'mes') {
+      key = r.fecha ? r.fecha.split('-')[2] : '?';
+    } else {
+      const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+      key = r.fecha ? meses[parseInt(r.fecha.split('-')[1])-1] : '?';
+    }
+    grupos[key] = (grupos[key]||0) + (r.total||0);
+  });
+
+  const entries = Object.entries(grupos);
+  if (!entries.length) { el.innerHTML = '<div style="color:var(--gris-t);font-size:12px;text-align:center;width:100%">Sin datos</div>'; return; }
+  const maxV = Math.max(...entries.map(e=>e[1]),1);
+  el.innerHTML = entries.map(([k,v])=>`
+    <div class="bar-wrap">
+      <div class="bar-val">${v}</div>
+      <div class="bar" style="height:${Math.max(6,Math.round(v/maxV*90))}px"></div>
+      <div class="bar-lbl">${k}</div>
+    </div>`).join('');
+}
+
+// ─── UTILS ─────────────────────────────────────────────────────────
+function fmt(d) {
+  if (!d) return '';
+  const diff = Math.floor((new Date()-d)/60000);
+  if (diff < 1)    return 'Ahora mismo';
+  if (diff < 60)   return `Hace ${diff} min`;
+  if (diff < 1440) return `Hace ${Math.floor(diff/60)}h`;
+  return d.toLocaleDateString('es-CO',{day:'numeric',month:'short'});
+}
+
+function esc(t='') { return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+window.toast = function(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
