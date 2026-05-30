@@ -333,7 +333,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
           <button class="ctab" onclick="selCulto(this,'domingo-vespertino')">🌆 Dom. Vespertino</button>
           <button class="ctab" onclick="selCulto(this,'miercoles')">🕊️ Miércoles</button>
           <button class="ctab" onclick="selCulto(this,'viernes')">✝️ Viernes</button>
-          <button class="ctab" onclick="selCulto(this,'matutino')">🌅 Matutino</button>
+          <button class="ctab" onclick="selCulto(this,'matutino')">🌅 Matutino (Lun/Mié/Vie)</button>
         </div>
       </div>
 
@@ -433,8 +433,8 @@ const ZONAS_BASE = ['Zona 1','Zona 2','Zona 3','Zona 4','Zona 5','Zona 6','Zona 
 const ZONAS = {
   'domingo-matutino':  ZONAS_BASE,
   'domingo-vespertino':ZONAS_BASE,
-  'miercoles':         [...ZONAS_BASE, 'Matutino'],
-  'viernes':           [...ZONAS_BASE, 'Matutino'],
+  'miercoles':         ZONAS_BASE,
+  'viernes':           ZONAS_BASE,
   'matutino':          ZONAS_BASE,
 };
 
@@ -443,7 +443,7 @@ const CULTO_LABELS = {
   'domingo-vespertino':'🌆 Dom. Vespertino',
   'miercoles':         '🕊️ Miércoles',
   'viernes':           '✝️ Viernes',
-  'matutino':          '🌅 Matutino',
+  'matutino':          '🌅 Matutino (Lun/Mié/Vie)',
 };
 
 const AV_COLORS = ['av-azul','av-dorado','av-verde','av-morado','av-azul','av-verde'];
