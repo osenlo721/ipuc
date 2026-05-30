@@ -132,25 +132,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-send{background:var(--azul);color:white;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 
 /* CULTOS */
-.culto-selector{background:white;border-radius:var(--radio);padding:14px;margin-bottom:10px;box-shadow:var(--sombra)}
-.culto-selector-title{font-size:12px;font-weight:700;color:var(--oscuro);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
-.culto-tabs{display:flex;gap:6px;flex-wrap:wrap}
-.ctab{font-size:12px;padding:7px 14px;border-radius:20px;border:1.5px solid var(--gris-b);cursor:pointer;background:var(--gris);color:var(--gris-t);font-weight:600;transition:all .15s}
-.ctab.active{background:var(--azul);color:white;border-color:var(--azul)}
-.zone-block{background:white;border-radius:var(--radio);padding:14px;margin-bottom:10px;box-shadow:var(--sombra)}
-.zone-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.zone-name{font-size:14px;font-weight:700;color:var(--oscuro)}
-.zone-sub{font-size:11px;color:var(--gris-t);margin-top:1px}
-.counters{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.culto-titulo{background:linear-gradient(135deg,var(--oscuro),var(--azul));border-radius:var(--radio);padding:16px 18px;margin-bottom:6px;color:white;display:flex;align-items:center;justify-content:space-between;cursor:pointer;box-shadow:var(--sombra);user-select:none}
+.culto-titulo-sub{font-size:10px;opacity:.72;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.culto-titulo-nombre{font-size:18px;font-weight:700}
+.culto-titulo-flecha{font-size:22px;opacity:.85}
+.culto-menu{background:white;border-radius:var(--radio);box-shadow:var(--sombra);margin-bottom:8px;overflow:hidden;display:none}
+.culto-menu.open{display:block}
+.culto-menu-item{padding:14px 18px;font-size:14px;font-weight:600;color:var(--oscuro);cursor:pointer;border-bottom:1px solid var(--gris-b)}
+.culto-menu-item:last-child{border-bottom:none}
+.culto-menu-item:active{background:var(--gris)}
+.culto-fecha{background:white;border-radius:var(--radio);padding:12px 16px;margin-bottom:8px;box-shadow:var(--sombra);font-size:13px;color:var(--oscuro);font-weight:600}
+.culto-zona-wrap{background:white;border-radius:var(--radio);padding:14px;margin-bottom:8px;box-shadow:var(--sombra)}
+.counters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
 .counter{text-align:center}
-.counter-lbl{font-size:9px;color:var(--gris-t);margin-bottom:5px;font-weight:600;text-transform:uppercase}
-.counter-ctrl{display:flex;align-items:center;justify-content:center;gap:4px}
-.c-btn{width:28px;height:28px;border:1px solid var(--gris-b);border-radius:8px;background:var(--gris);font-size:16px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
-.c-btn:active{background:var(--gris-b)}
-.c-val{font-size:18px;font-weight:700;color:var(--oscuro);min-width:32px;text-align:center}
-.obs-input{width:100%;border:1px solid var(--gris-b);border-radius:8px;padding:8px 10px;font-size:12px;font-family:inherit;resize:none;height:50px;color:var(--texto)}
+.counter-lbl{font-size:10px;color:var(--gris-t);margin-bottom:6px;font-weight:700;text-transform:uppercase}
+.counter-ctrl{display:flex;align-items:center;justify-content:center;gap:6px}
+.c-btn{width:32px;height:32px;border:1.5px solid var(--gris-b);border-radius:8px;background:var(--gris);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--oscuro)}
+.c-btn:active{background:var(--azul);color:white;border-color:var(--azul)}
+.c-val{font-size:22px;font-weight:700;color:var(--oscuro);min-width:36px;text-align:center}
+.c-total-wrap{text-align:center;padding-top:10px;border-top:1px solid var(--gris-b)}
+.obs-input{width:100%;border:1.5px solid var(--gris-b);border-radius:8px;padding:10px;font-size:13px;font-family:inherit;resize:none;height:55px;color:var(--texto);margin-bottom:8px}
 .obs-input:focus{outline:none;border-color:var(--azul)}
-.btn-guardar{background:linear-gradient(90deg,var(--oscuro),var(--azul));color:white;border:none;width:100%;padding:11px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:10px}
+.btn-guardar{background:linear-gradient(90deg,var(--oscuro),var(--azul));color:white;border:none;width:100%;padding:13px;border-radius:var(--radio);font-size:14px;font-weight:700;cursor:pointer}
 .consolidado{background:linear-gradient(135deg,var(--oscuro),var(--azul));border-radius:var(--radio);padding:16px;margin-bottom:10px;color:white}
 .consolidado h3{font-size:12px;opacity:.85;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
 .conso-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
@@ -323,35 +326,92 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
     <!-- CULTOS / ASISTENCIA -->
     <div id="view-cultos" class="view">
-      <div class="sec-header"><h3>✝️ Registro de Cultos</h3><p>Asistencia por culto y zona</p></div>
 
-      <!-- Selector de culto -->
-      <div class="culto-selector">
-        <div class="culto-selector-title">📅 Selecciona el culto</div>
-        <div class="culto-tabs">
-          <button class="ctab active" onclick="selCulto(this,'domingo-matutino')">☀️ Dom. Matutino</button>
-          <button class="ctab" onclick="selCulto(this,'domingo-vespertino')">🌆 Dom. Vespertino</button>
-          <button class="ctab" onclick="selCulto(this,'miercoles')">🕊️ Miércoles</button>
-          <button class="ctab" onclick="selCulto(this,'viernes')">✝️ Viernes</button>
-          <button class="ctab" onclick="selCulto(this,'matutino')">🌅 Matutino</button>
+      <!-- Título clickeable -->
+      <div class="culto-titulo" onclick="toggleCultoMenu()">
+        <div>
+          <div class="culto-titulo-sub">Registro de Cultos — toca para cambiar</div>
+          <div class="culto-titulo-nombre" id="culto-nombre">📖 Escuela Dominical</div>
+        </div>
+        <span id="culto-flecha" class="culto-titulo-flecha">▾</span>
+      </div>
+
+      <!-- Menú desplegable -->
+      <div class="culto-menu" id="culto-menu">
+        <div class="culto-menu-item" onclick="selCulto('escuela','📖 Escuela Dominical',false)">📖 Escuela Dominical</div>
+        <div class="culto-menu-item" onclick="selCulto('evangelistico','🔥 Culto Evangelístico',false)">🔥 Culto Evangelístico</div>
+        <div class="culto-menu-item" onclick="selCulto('matutino','🌅 Matutino (Lun/Mié/Vie)',true)">🌅 Matutino (Lun/Mié/Vie)</div>
+        <div class="culto-menu-item" onclick="selCulto('miercoles','🕊️ Miércoles',true)">🕊️ Miércoles</div>
+        <div class="culto-menu-item" onclick="selCulto('viernes','✝️ Viernes',true)">✝️ Viernes</div>
+        <div class="culto-menu-item" onclick="selCulto('campana','📣 Campaña',true)">📣 Campaña</div>
+        <div class="culto-menu-item" onclick="selCulto('jueves','🙏 Jueves - Oración',true)">🙏 Jueves - Oración</div>
+        <div class="culto-menu-item" onclick="selCulto('sabado','🔥 Sábado - Juventud',true)">🔥 Sábado - Juventud</div>
+      </div>
+
+      <!-- Fecha actual -->
+      <div class="culto-fecha">📅 <span id="culto-fecha-txt"></span></div>
+
+      <!-- Select de zona (solo para cultos que lo requieren) -->
+      <div class="culto-zona-wrap" id="culto-zona-wrap" style="display:none">
+        <label class="form-label">🗺️ Zona</label>
+        <select class="form-input" id="culto-zona">
+          <option value="">— Selecciona zona —</option>
+          <option>Zona 1</option>
+          <option>Zona 2</option>
+          <option>Zona 3</option>
+          <option>Zona 4</option>
+          <option>Zona 5</option>
+          <option>Zona 6</option>
+          <option>Zona 7</option>
+          <option>Zona 8 - Estación Villa</option>
+        </select>
+      </div>
+
+      <!-- Contadores de asistencia -->
+      <div class="card">
+        <div class="counters">
+          <div class="counter">
+            <div class="counter-lbl">Hermanos</div>
+            <div class="counter-ctrl">
+              <button class="c-btn" onclick="step('c-herm',-1)">−</button>
+              <div class="c-val" id="c-herm">0</div>
+              <button class="c-btn" onclick="step('c-herm',1)">+</button>
+            </div>
+          </div>
+          <div class="counter">
+            <div class="counter-lbl">Hermanas</div>
+            <div class="counter-ctrl">
+              <button class="c-btn" onclick="step('c-herm2',-1)">−</button>
+              <div class="c-val" id="c-herm2">0</div>
+              <button class="c-btn" onclick="step('c-herm2',1)">+</button>
+            </div>
+          </div>
+          <div class="counter">
+            <div class="counter-lbl">Niños</div>
+            <div class="counter-ctrl">
+              <button class="c-btn" onclick="step('c-ninos',-1)">−</button>
+              <div class="c-val" id="c-ninos">0</div>
+              <button class="c-btn" onclick="step('c-ninos',1)">+</button>
+            </div>
+          </div>
+          <div class="counter">
+            <div class="counter-lbl">Visitas</div>
+            <div class="counter-ctrl">
+              <button class="c-btn" onclick="step('c-vis',-1)">−</button>
+              <div class="c-val" id="c-vis">0</div>
+              <button class="c-btn" onclick="step('c-vis',1)">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="c-total-wrap">
+          <span style="font-size:12px;color:var(--gris-t)">Total asistentes: </span>
+          <span style="font-size:22px;font-weight:700;color:var(--oscuro)" id="c-total">0</span>
         </div>
       </div>
 
-      <!-- Consolidado del día -->
-      <div class="consolidado">
-        <h3>📊 Consolidado del culto</h3>
-        <div class="conso-grid">
-          <div><div class="conso-n" id="t-herm">0</div><div class="conso-l">Hermanos</div></div>
-          <div><div class="conso-n" id="t-herm2">0</div><div class="conso-l">Hermanas</div></div>
-          <div><div class="conso-n" id="t-ninos">0</div><div class="conso-l">Niños</div></div>
-          <div><div class="conso-n" id="t-vis">0</div><div class="conso-l">Visitas</div></div>
-        </div>
-      </div>
-
-      <!-- Zonas -->
-      <div id="zonas-container"></div>
-
-      <div style="height:8px"></div>
+      <textarea class="obs-input" id="culto-obs" placeholder="Observaciones..."></textarea>
+      <button class="btn-guardar" onclick="guardarCulto()">✓ Guardar registro</button>
+      <div style="height:12px"></div>
     </div>
 
     <!-- ESTADÍSTICAS -->
@@ -464,7 +524,7 @@ onAuthStateChanged(auth, async user => {
     }
     await crearPerfilSiNoExiste(user);
     cargarPosts();
-    renderZonas();
+    initCultosUI();
     cargarStats('sem');
   } else {
     currentUser = null;
@@ -513,7 +573,7 @@ window.nav = function(v, el) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   if (v === 'inicio')  cargarPosts();
-  if (v === 'cultos')  renderZonas();
+  if (v === 'cultos')  initCultosUI();
   if (v === 'stats')   cargarStats(periodoActivo);
 }
 
@@ -646,109 +706,66 @@ window.sendMsg = async function() {
 }
 
 // ─── CULTOS / ASISTENCIA ───────────────────────────────────────────
-window.selCulto = function(btn, culto) {
-  cultoActivo = culto;
-  document.querySelectorAll('.ctab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderZonas();
+function initCultosUI() {
+  const hoy = new Date();
+  const opts = {weekday:'long', year:'numeric', month:'long', day:'numeric'};
+  const el = document.getElementById('culto-fecha-txt');
+  if (el) el.textContent = hoy.toLocaleDateString('es-CO', opts);
 }
 
-function renderZonas() {
-  const zonas = ZONAS[cultoActivo] || [];
-  const container = document.getElementById('zonas-container');
-  container.innerHTML = zonas.map((zona, i) => {
-    const avC = AV_COLORS[i % AV_COLORS.length];
-    const ini = zona.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
-    const id = `z${i}`;
-    return `<div class="zone-block">
-      <div class="zone-hdr">
-        <div class="av ${avC}" style="width:40px;height:40px">${ini}</div>
-        <div><div class="zone-name">${zona}</div><div class="zone-sub">${CULTO_LABELS[cultoActivo]||cultoActivo}</div></div>
-      </div>
-      <div class="counters">
-        <div class="counter">
-          <div class="counter-lbl">Hermanos</div>
-          <div class="counter-ctrl">
-            <button class="c-btn" onclick="step('h${id}',-1)">−</button>
-            <div class="c-val" id="h${id}">0</div>
-            <button class="c-btn" onclick="step('h${id}',1)">+</button>
-          </div>
-        </div>
-        <div class="counter">
-          <div class="counter-lbl">Hermanas</div>
-          <div class="counter-ctrl">
-            <button class="c-btn" onclick="step('m${id}',-1)">−</button>
-            <div class="c-val" id="m${id}">0</div>
-            <button class="c-btn" onclick="step('m${id}',1)">+</button>
-          </div>
-        </div>
-        <div class="counter">
-          <div class="counter-lbl">Niños</div>
-          <div class="counter-ctrl">
-            <button class="c-btn" onclick="step('n${id}',-1)">−</button>
-            <div class="c-val" id="n${id}">0</div>
-            <button class="c-btn" onclick="step('n${id}',1)">+</button>
-          </div>
-        </div>
-        <div class="counter">
-          <div class="counter-lbl">Visitas</div>
-          <div class="counter-ctrl">
-            <button class="c-btn" onclick="step('v${id}',-1)">−</button>
-            <div class="c-val" id="v${id}">0</div>
-            <button class="c-btn" onclick="step('v${id}',1)">+</button>
-          </div>
-        </div>
-      </div>
-      <textarea class="obs-input" id="obs${id}" placeholder="Observaciones de ${zona}..."></textarea>
-      <button class="btn-guardar" onclick="guardarZona('${zona}','h${id}','m${id}','n${id}','v${id}','obs${id}')">✓ Guardar ${zona}</button>
-    </div>`;
-  }).join('');
-  actualizarConsolidado();
+window.toggleCultoMenu = function() {
+  const menu = document.getElementById('culto-menu');
+  const flecha = document.getElementById('culto-flecha');
+  menu.classList.toggle('open');
+  flecha.textContent = menu.classList.contains('open') ? '▴' : '▾';
+}
+
+window.selCulto = function(culto, label, conZona) {
+  cultoActivo = culto;
+  document.getElementById('culto-nombre').textContent = label;
+  document.getElementById('culto-menu').classList.remove('open');
+  document.getElementById('culto-flecha').textContent = '▾';
+  document.getElementById('culto-zona-wrap').style.display = conZona ? 'block' : 'none';
+  ['c-herm','c-herm2','c-ninos','c-vis'].forEach(id => document.getElementById(id).textContent = '0');
+  document.getElementById('c-total').textContent = '0';
+  document.getElementById('culto-obs').value = '';
+  if (conZona) document.getElementById('culto-zona').value = '';
 }
 
 window.step = function(id, delta) {
   const el = document.getElementById(id);
-  const val = Math.max(0, parseInt(el.textContent) + delta);
-  el.textContent = val;
-  actualizarConsolidado();
+  el.textContent = Math.max(0, parseInt(el.textContent) + delta);
+  const total = ['c-herm','c-herm2','c-ninos','c-vis']
+    .reduce((s, i) => s + parseInt(document.getElementById(i).textContent), 0);
+  document.getElementById('c-total').textContent = total;
 }
 
-function actualizarConsolidado() {
-  const zonas = ZONAS[cultoActivo] || [];
-  let herm=0, herm2=0, ninos=0, vis=0;
-  zonas.forEach((_, i) => {
-    const id = `z${i}`;
-    herm  += parseInt(document.getElementById('h'+id)?.textContent||0);
-    herm2 += parseInt(document.getElementById('m'+id)?.textContent||0);
-    ninos += parseInt(document.getElementById('n'+id)?.textContent||0);
-    vis   += parseInt(document.getElementById('v'+id)?.textContent||0);
-  });
-  document.getElementById('t-herm').textContent  = herm;
-  document.getElementById('t-herm2').textContent = herm2;
-  document.getElementById('t-ninos').textContent = ninos;
-  document.getElementById('t-vis').textContent   = vis;
-}
-
-window.guardarZona = async function(zona, hId, mId, nId, vId, obsId) {
+window.guardarCulto = async function() {
   if (!currentUser) { toast('Debes iniciar sesión'); return; }
-  const hermanos  = parseInt(document.getElementById(hId).textContent);
-  const hermanas  = parseInt(document.getElementById(mId).textContent);
-  const ninos     = parseInt(document.getElementById(nId).textContent);
-  const visitas   = parseInt(document.getElementById(vId).textContent);
-  const obs       = document.getElementById(obsId).value;
-  const total     = hermanos + hermanas + ninos + visitas;
-  const fecha     = new Date().toISOString().split('T')[0];
+  const hermanos = parseInt(document.getElementById('c-herm').textContent);
+  const hermanas = parseInt(document.getElementById('c-herm2').textContent);
+  const ninos    = parseInt(document.getElementById('c-ninos').textContent);
+  const visitas  = parseInt(document.getElementById('c-vis').textContent);
+  const zona     = document.getElementById('culto-zona')?.value || '';
+  const obs      = document.getElementById('culto-obs').value;
+  const total    = hermanos + hermanas + ninos + visitas;
+  const fecha    = new Date().toISOString().split('T')[0];
+  const btn      = document.querySelector('#view-cultos .btn-guardar');
+  btn.disabled = true; btn.textContent = 'Guardando...';
   try {
     await addDoc(collection(db,'asistencia'), {
-      culto: cultoActivo,
-      zona, hermanos, hermanas, ninos, visitas, total,
+      culto: cultoActivo, zona, hermanos, hermanas, ninos, visitas, total,
       observaciones: obs, fecha,
       registradoPor: currentUser.uid,
       registradoPorNombre: currentUser.displayName || currentUser.email,
       timestamp: serverTimestamp()
     });
-    toast(`✅ ${zona} guardada — ${total} asistentes`);
+    toast(`✅ Guardado — ${total} asistentes`);
+    ['c-herm','c-herm2','c-ninos','c-vis'].forEach(id => document.getElementById(id).textContent = '0');
+    document.getElementById('c-total').textContent = '0';
+    document.getElementById('culto-obs').value = '';
   } catch(e) { toast('❌ Error al guardar'); }
+  finally { btn.disabled = false; btn.textContent = '✓ Guardar registro'; }
 }
 
 // ─── ESTADÍSTICAS ──────────────────────────────────────────────────
